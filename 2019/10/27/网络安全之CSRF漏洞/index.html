@@ -99,7 +99,7 @@
 <script src="\assets\js\APlayer.min.js" class="aplayer-script-marker"></script>
 </head><body><section class="profile-close" id="cxo-profile"><div class="profile-avatar"><i class="fa fa-caret-left"></i><img src="https://i.loli.net/2019/03/07/5c809e0647313.jpg"></div><!--.profile-saying
   i.fa.fa-comment
-  .saying--><div class="cxo-profile-inner"><div class="profile-name">云亦然</div><div class="profile-signature">天下皆白，唯我独黑。非攻墨门，兼爱平生。</div><div class="friends"><div>FRIENDS</div><span><a href="//www.hxsgyl.top" target="_black">忘年</a></span><span><a href="//bbs.88hack.com/" target="_black">极安中国</a></span><span><a href="//www.soul666.com/" target="_black">Soul博客</a></span></div><div class="read-progress"></div></div></section><header id="cxo-intro" style="height: 70vh;background-image: url(https://api.r10086.com/动漫综合2.php);"><nav id="cxo-intro-nav"><section><div class="intro-nav-title"><a href="/">云亦然's Blog</a></div><div class="intro-nav-label-box"><a href="/">Home</a><a href="/about/">About</a><a href="/archives/">Archives</a><a href="/tags/">Tags</a></div><i class="fa fa-bars intro-nav-menu"><div class="intro-nav-drop"><a href="/">Home</a><a href="/about/">About</a><a href="/archives/">Archives</a><a href="/tags/">Tags</a></div></i><div class="clear"></div></section></nav><h1 class="post-title">网络安全之CSRF漏洞</h1><div class="post-intros"><div class="post-intro-meta"><span class="post-intro-time"><i class="post-intro-calendar fa fa-calendar"></i><span>2019-10-27 15:53:00</span></span><span class="post-intro-tags"><a class="intro-tag fa fa-tag" href="javascript:void(0)" date-tags="网络安全"> 网络安全</a></span></div><div class="post-intro-read"><span> Word count: <span class="post-count">565</span> | Reading time: <span class="post-count">2</span>min</span></div></div></header><article class="cxo-up" id="cxo-content-outer"><section id="cxo-content-inner"><article class="article-entry" id="post"><h1 id="CSRF漏洞"><a href="#CSRF漏洞" class="headerlink" title="CSRF漏洞"></a>CSRF漏洞</h1><h2 id="CSRF漏洞专题概述"><a href="#CSRF漏洞专题概述" class="headerlink" title="CSRF漏洞专题概述"></a>CSRF漏洞专题概述</h2><p>Cross-Site Request Forgery（CSRF），中文一般译作跨站请求伪造。经常入选owasp Top10，在当前web漏洞排行中，与xss、sql注入等相比而言，CSRF相对来说受到的关注要小很多，但是危害却非常大。可以这么理解CSRF攻击：攻击者盗用了你的身份，以你的名义发送恶意请求。CSRF能够做的事情包括：以你名义发送邮件，发消息，盗取你的帐号，甚至于购买商品，虚拟货币转账……造成的主要问题包括：个人隐私的泄漏以及财产安全。</p>
+  .saying--><div class="cxo-profile-inner"><div class="profile-name">云亦然</div><div class="profile-signature">天下皆白，唯我独黑。非攻墨门，兼爱平生。</div><div class="friends"><div>FRIENDS</div><span><a href="//www.hxsgyl.top" target="_black">忘年</a></span><span><a href="//bbs.88hack.com/" target="_black">极安中国</a></span><span><a href="//www.soul666.com/" target="_black">Soul博客</a></span></div><div class="read-progress"></div></div></section><header id="cxo-intro" style="height: 70vh;background-image: url(https://api.r10086.com/动漫综合2.php);"><nav id="cxo-intro-nav"><section><div class="intro-nav-title"><a href="/">云亦然's Blog</a></div><div class="intro-nav-label-box"><a href="/">Home</a><a href="/about/">About</a><a href="/archives/">Archives</a><a href="/tags/">Tags</a></div><i class="fa fa-bars intro-nav-menu"><div class="intro-nav-drop"><a href="/">Home</a><a href="/about/">About</a><a href="/archives/">Archives</a><a href="/tags/">Tags</a></div></i><div class="clear"></div></section></nav><h1 class="post-title">网络安全之CSRF漏洞</h1><div class="post-intros"><div class="post-intro-meta"><span class="post-intro-time"><i class="post-intro-calendar fa fa-calendar"></i><span>2019-10-27 15:53:00</span></span><span class="post-intro-tags"><a class="intro-tag fa fa-tag" href="javascript:void(0)" date-tags="网络安全"> 网络安全</a></span></div><div class="post-intro-read"><span> Word count: <span class="post-count">566</span> | Reading time: <span class="post-count">2</span>min</span></div></div></header><article class="cxo-up" id="cxo-content-outer"><section id="cxo-content-inner"><article class="article-entry" id="post"><h1 id="CSRF漏洞"><a href="#CSRF漏洞" class="headerlink" title="CSRF漏洞"></a>CSRF漏洞</h1><h2 id="CSRF漏洞专题概述"><a href="#CSRF漏洞专题概述" class="headerlink" title="CSRF漏洞专题概述"></a>CSRF漏洞专题概述</h2><p>Cross-Site Request Forgery（CSRF），中文一般译作跨站请求伪造。经常入选owasp Top10，在当前web漏洞排行中，与xss、sql注入等相比而言，CSRF相对来说受到的关注要小很多，但是危害却非常大。可以这么理解CSRF攻击：攻击者盗用了你的身份，以你的名义发送恶意请求。CSRF能够做的事情包括：以你名义发送邮件，发消息，盗取你的帐号，甚至于购买商品，虚拟货币转账……造成的主要问题包括：个人隐私的泄漏以及财产安全。</p>
 <h2 id="CSRF攻击的常见危害"><a href="#CSRF攻击的常见危害" class="headerlink" title="CSRF攻击的常见危害"></a>CSRF攻击的常见危害</h2><ol>
 <li>发送邮件</li>
 <li>修改账户信息</li>
@@ -129,19 +129,19 @@
 <li>在non-GET请求中使用Security token（安全性令牌）</li>
 </ol>
 
-        <div id="aplayer-VYRBeLFN" class="aplayer aplayer-tag-marker" style="margin-bottom: 20px;">
+        <div id="aplayer-JyvDFEqu" class="aplayer aplayer-tag-marker" style="margin-bottom: 20px;">
             <pre class="aplayer-lrc-content"></pre>
         </div>
         <script>
           var ap = new APlayer({
-            element: document.getElementById("aplayer-VYRBeLFN"),
+            element: document.getElementById("aplayer-JyvDFEqu"),
             narrow: false,
             autoplay: true,
             showlrc: false,
             music: {
-              title: "网易云歌曲",
+              title: "动漫歌曲",
               author: "随机",
-              url: "https://api.uomg.com/api/rand.music",
+              url: "https://api.paugram.com/acgm/?list=1&play=true",
               pic: "https://i.loli.net/2019/03/07/5c80ce3a5aac4.png",
               lrc: ""
             }

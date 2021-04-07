@@ -99,7 +99,7 @@
 <script src="\assets\js\APlayer.min.js" class="aplayer-script-marker"></script>
 </head><body><section class="profile-close" id="cxo-profile"><div class="profile-avatar"><i class="fa fa-caret-left"></i><img src="https://i.loli.net/2019/03/07/5c809e0647313.jpg"></div><!--.profile-saying
   i.fa.fa-comment
-  .saying--><div class="cxo-profile-inner"><div class="profile-name">云亦然</div><div class="profile-signature">天下皆白，唯我独黑。非攻墨门，兼爱平生。</div><div class="friends"><div>FRIENDS</div><span><a href="//www.hxsgyl.top" target="_black">忘年</a></span><span><a href="//bbs.88hack.com/" target="_black">极安中国</a></span><span><a href="//www.soul666.com/" target="_black">Soul博客</a></span></div><div class="read-progress"></div></div></section><header id="cxo-intro" style="height: 70vh;background-image: url(https://api.r10086.com/动漫综合2.php);"><nav id="cxo-intro-nav"><section><div class="intro-nav-title"><a href="/">云亦然's Blog</a></div><div class="intro-nav-label-box"><a href="/">Home</a><a href="/about/">About</a><a href="/archives/">Archives</a><a href="/tags/">Tags</a></div><i class="fa fa-bars intro-nav-menu"><div class="intro-nav-drop"><a href="/">Home</a><a href="/about/">About</a><a href="/archives/">Archives</a><a href="/tags/">Tags</a></div></i><div class="clear"></div></section></nav><h1 class="post-title">打造企业级Zabbix</h1><div class="post-intros"><div class="post-intro-meta"><span class="post-intro-time"><i class="post-intro-calendar fa fa-calendar"></i><span>2018-11-28 11:39:11</span></span><span class="post-intro-tags"><a class="intro-tag fa fa-tag" href="javascript:void(0)" date-tags="Zabbix"> Zabbix</a></span></div><div class="post-intro-read"><span> Word count: <span class="post-count">472</span> | Reading time: <span class="post-count">1</span>min</span></div></div></header><article class="cxo-up" id="cxo-content-outer"><section id="cxo-content-inner"><article class="article-entry" id="post"><p>安装企业级网络监视Zabbix<br>我是在CentOS-7-KdeLive下进行安装下载的，<br>在这之前，我是看到了前沿信安有推文，环境基于LAMP平台搭建了ZABBIX官网4.0版本，<br>我下载回来之后，用虚拟机扫描他的虚拟机文件，按下图步骤做，<br><img src="https://i.loli.net/2019/03/07/5c809f4499907.png" alt=""><br>发现出现了“zabbix监控报错zabbix server is not running: the information displayed may not be current”的问题，<br>百度给出了一些处理方法，但是还是没法解决，然后我就想自己搞镜像来安装Zabbix。</p>
+  .saying--><div class="cxo-profile-inner"><div class="profile-name">云亦然</div><div class="profile-signature">天下皆白，唯我独黑。非攻墨门，兼爱平生。</div><div class="friends"><div>FRIENDS</div><span><a href="//www.hxsgyl.top" target="_black">忘年</a></span><span><a href="//bbs.88hack.com/" target="_black">极安中国</a></span><span><a href="//www.soul666.com/" target="_black">Soul博客</a></span></div><div class="read-progress"></div></div></section><header id="cxo-intro" style="height: 70vh;background-image: url(https://api.r10086.com/动漫综合2.php);"><nav id="cxo-intro-nav"><section><div class="intro-nav-title"><a href="/">云亦然's Blog</a></div><div class="intro-nav-label-box"><a href="/">Home</a><a href="/about/">About</a><a href="/archives/">Archives</a><a href="/tags/">Tags</a></div><i class="fa fa-bars intro-nav-menu"><div class="intro-nav-drop"><a href="/">Home</a><a href="/about/">About</a><a href="/archives/">Archives</a><a href="/tags/">Tags</a></div></i><div class="clear"></div></section></nav><h1 class="post-title">打造企业级Zabbix</h1><div class="post-intros"><div class="post-intro-meta"><span class="post-intro-time"><i class="post-intro-calendar fa fa-calendar"></i><span>2018-11-28 11:39:11</span></span><span class="post-intro-tags"><a class="intro-tag fa fa-tag" href="javascript:void(0)" date-tags="Zabbix"> Zabbix</a></span></div><div class="post-intro-read"><span> Word count: <span class="post-count">475</span> | Reading time: <span class="post-count">1</span>min</span></div></div></header><article class="cxo-up" id="cxo-content-outer"><section id="cxo-content-inner"><article class="article-entry" id="post"><p>安装企业级网络监视Zabbix<br>我是在CentOS-7-KdeLive下进行安装下载的，<br>在这之前，我是看到了前沿信安有推文，环境基于LAMP平台搭建了ZABBIX官网4.0版本，<br>我下载回来之后，用虚拟机扫描他的虚拟机文件，按下图步骤做，<br><img src="https://i.loli.net/2019/03/07/5c809f4499907.png" alt=""><br>发现出现了“zabbix监控报错zabbix server is not running: the information displayed may not be current”的问题，<br>百度给出了一些处理方法，但是还是没法解决，然后我就想自己搞镜像来安装Zabbix。</p>
 <p>1.安装apache（没遇到问题）</p>
 <p>2.安装mysql<br>（发现yum install mariadb mariadb-server mariadb-libs mariadb-devel错误）【一定要先检查有没有 yum list mariadb*和查看命令：rpm -qa | grep mariadb】<br>还有可能就是（需要自己添加yum数据源）<br>tips：MySQL 已经不再包含在 CentOS 7 的源中，而改用了 MariaDB，centos 7 中自带MariaDB。。</p>
 <p>3.安装Zabbix 前端（最简单）<br>经过了长久的安装配置，最终安装好了Zabbix之后，<br>还是出现了（Zabbix服务器正在运行    没有    本地主机：10051）。。<br>很是难受，然后去查了日志｛cannot start preprocessing service｝小白的我，看不懂。。<br>最后一个小小的改动就解决的，把（SELinux status:）的值永久设置为disabled。<br>然后reboot，然后就成功了。如图下：<br><img src="https://i.loli.net/2019/03/07/5c809f62d2ecf.png" alt=""><br> 终于解决了，很开心。<br>linux 升级命令的一些：<br>yum -y update</p>
@@ -107,19 +107,19 @@
 <p>代码如下:<br>yum -y upgrade<br>只升级所有包，不升级软件和系统内核</p>
 <p>努力学习linux执行代码，在安装软件时候碰到的小问题，升级之后就可以安装了。</p>
 
-        <div id="aplayer-SaiBLKDj" class="aplayer aplayer-tag-marker" style="margin-bottom: 20px;">
+        <div id="aplayer-FGCMaMXv" class="aplayer aplayer-tag-marker" style="margin-bottom: 20px;">
             <pre class="aplayer-lrc-content"></pre>
         </div>
         <script>
           var ap = new APlayer({
-            element: document.getElementById("aplayer-SaiBLKDj"),
+            element: document.getElementById("aplayer-FGCMaMXv"),
             narrow: false,
             autoplay: true,
             showlrc: false,
             music: {
-              title: "抖音热曲",
+              title: "动漫歌曲",
               author: "随机",
-              url: "https://www.lori.tw/dyph.php",
+              url: "https://api.paugram.com/acgm/?list=1&play=true",
               pic: "https://i.loli.net/2019/03/07/5c80ce3a5aac4.png",
               lrc: ""
             }
