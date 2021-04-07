@@ -1,0 +1,133 @@
+<!DOCTYPE html><html><head><meta name="generator" content="Hexo 3.8.0"><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no"><meta name="author" content="云亦然"><meta name="renderer" content="webkit"><meta name="baidu-site-verification" content="Gp9ShUqSBW"><meta name="google-site-verification" content="vnHxw9xKnwp2dRWqAPmI-QTMJvCDfbXRuoMzb2RbHZw"><meta name="copyright" content="云亦然"><meta name="keywords" content="Hexo"><meta name="description" content="null"><meta name="Cache-Control" content="no-cache"><meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"><title>Python爬取豆瓣正在热映 · 云亦然's Blog</title><link rel="stylesheet" href="/css/style.css?v=2018.7.9"><link rel="stylesheet" href="/css/animation.css?v=2018.7.9"><link rel="icon" href="/source/img/assets/favicon.ico"><link rel="stylesheet" href="https://cdn.bootcss.com/font-awesome/4.7.0/css/font-awesome.min.css?version=1.5.6"><!-- scripts--><script>(function( w ){
+  "use strict";
+  // rel=preload support test
+  if( !w.loadCSS ){
+    w.loadCSS = function(){};
+  }
+  // define on the loadCSS obj
+  var rp = loadCSS.relpreload = {};
+  // rel=preload feature support test
+  // runs once and returns a function for compat purposes
+  rp.support = (function(){
+    var ret;
+    try {
+      ret = w.document.createElement( "link" ).relList.supports( "preload" );
+    } catch (e) {
+      ret = false;
+    }
+    return function(){
+      return ret;
+    };
+  })();
+
+  // if preload isn't supported, get an asynchronous load by using a non-matching media attribute
+  // then change that media back to its intended value on load
+  rp.bindMediaToggle = function( link ){
+    // remember existing media attr for ultimate state, or default to 'all'
+    var finalMedia = link.media || "all";
+
+    function enableStylesheet(){
+      link.media = finalMedia;
+    }
+
+    // bind load handlers to enable media
+    if( link.addEventListener ){
+      link.addEventListener( "load", enableStylesheet );
+    } else if( link.attachEvent ){
+      link.attachEvent( "onload", enableStylesheet );
+    }
+
+    // Set rel and non-applicable media type to start an async request
+    // note: timeout allows this to happen async to let rendering continue in IE
+    setTimeout(function(){
+      link.rel = "stylesheet";
+      link.media = "only x";
+    });
+    // also enable media after 3 seconds,
+    // which will catch very old browsers (android 2.x, old firefox) that don't support onload on link
+    setTimeout( enableStylesheet, 3000 );
+  };
+
+  // loop through link elements in DOM
+  rp.poly = function(){
+    // double check this to prevent external calls from running
+    if( rp.support() ){
+      return;
+    }
+    var links = w.document.getElementsByTagName( "link" );
+    for( var i = 0; i < links.length; i++ ){
+      var link = links[ i ];
+      // qualify links to those with rel=preload and as=style attrs
+      if( link.rel === "preload" && link.getAttribute( "as" ) === "style" && !link.getAttribute( "data-loadcss" ) ){
+        // prevent rerunning on link
+        link.setAttribute( "data-loadcss", true );
+        // bind listeners to toggle media back
+        rp.bindMediaToggle( link );
+      }
+    }
+  };
+
+  // if unsupported, run the polyfill
+  if( !rp.support() ){
+    // run once at least
+    rp.poly();
+
+    // rerun poly on an interval until onload
+    var run = w.setInterval( rp.poly, 500 );
+    if( w.addEventListener ){
+      w.addEventListener( "load", function(){
+        rp.poly();
+        w.clearInterval( run );
+      } );
+    } else if( w.attachEvent ){
+      w.attachEvent( "onload", function(){
+        rp.poly();
+        w.clearInterval( run );
+      } );
+    }
+  }
+
+
+  // commonjs
+  if( typeof exports !== "undefined" ){
+    exports.loadCSS = loadCSS;
+  }
+  else {
+    w.loadCSS = loadCSS;
+  }
+}( typeof global !== "undefined" ? global : this ) );</script><script src="https://cdn.jsdelivr.net/npm/jquery@3.3.1/dist/jquery.min.js" defer></script><script src="/js/main.js?v=2018.7.9" defer></script><!-- fancybox--><link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.2.5/jquery.fancybox.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'"><script src="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.2.5/jquery.fancybox.min.js" defer></script><!-- busuanzi--><script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script><link rel="stylesheet" href="\assets\css\APlayer.min.css" class="aplayer-style-marker">
+<script src="\assets\js\APlayer.min.js" class="aplayer-script-marker"></script>
+</head><body><section class="profile-close" id="cxo-profile"><div class="profile-avatar"><i class="fa fa-caret-left"></i><img src="https://i.loli.net/2019/03/07/5c809e0647313.jpg"></div><!--.profile-saying
+  i.fa.fa-comment
+  .saying--><div class="cxo-profile-inner"><div class="profile-name">云亦然</div><div class="profile-signature">天下皆白，唯我独黑。非攻墨门，兼爱平生。</div><div class="friends"><div>FRIENDS</div><span><a href="//www.hxsgyl.top" target="_black">忘年</a></span><span><a href="//bbs.88hack.com/" target="_black">极安中国</a></span><span><a href="//www.soul666.com/" target="_black">Soul博客</a></span></div><div class="read-progress"></div></div></section><header id="cxo-intro" style="height: 70vh;background-image: url(https://api.r10086.com/动漫综合2.php);"><nav id="cxo-intro-nav"><section><div class="intro-nav-title"><a href="/">云亦然's Blog</a></div><div class="intro-nav-label-box"><a href="/">Home</a><a href="/about/">About</a><a href="/archives/">Archives</a><a href="/tags/">Tags</a></div><i class="fa fa-bars intro-nav-menu"><div class="intro-nav-drop"><a href="/">Home</a><a href="/about/">About</a><a href="/archives/">Archives</a><a href="/tags/">Tags</a></div></i><div class="clear"></div></section></nav><h1 class="post-title">Python爬取豆瓣正在热映</h1><div class="post-intros"><div class="post-intro-meta"><span class="post-intro-time"><i class="post-intro-calendar fa fa-calendar"></i><span>2019-08-07 16:44:31</span></span><span class="post-intro-tags"><a class="intro-tag fa fa-tag" href="javascript:void(0)" date-tags="python爬虫笔记"> python爬虫笔记</a></span></div><div class="post-intro-read"><span> Word count: <span class="post-count">312</span> | Reading time: <span class="post-count">1</span>min</span></div></div></header><article class="cxo-up" id="cxo-content-outer"><section id="cxo-content-inner"><article class="article-entry" id="post"><h1 id="Python爬取豆瓣正在热映的电影信息"><a href="#Python爬取豆瓣正在热映的电影信息" class="headerlink" title="Python爬取豆瓣正在热映的电影信息"></a>Python爬取豆瓣正在热映的电影信息</h1><p><img src="https://i.loli.net/2019/08/15/Whb8F2yxeNfBDAd.jpg" alt=""><br><figure class="highlight nix"><figcaption><span>[Python爬虫豆瓣]</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># encoding: utf-8</span></span><br><span class="line"></span><br><span class="line"><span class="built_in">import</span> requests</span><br><span class="line">from lxml <span class="built_in">import</span> etree</span><br><span class="line"></span><br><span class="line"><span class="comment"># 1. 将目标网站上的页面抓取下来</span></span><br><span class="line"><span class="attr">headers</span> = &#123;</span><br><span class="line">    'User-Agent': <span class="string">"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/74.0.3729.131 Safari/537.36"</span>,</span><br><span class="line">    'Referer': <span class="string">"https://movie.douban.com/"</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="attr">url</span> = <span class="string">"https://movie.douban.com/cinema/nowplaying/zhongshan/"</span></span><br><span class="line"><span class="attr">response</span> = requests.get(url, <span class="attr">headers=headers)</span></span><br><span class="line"><span class="attr">text</span> = response.text</span><br><span class="line"><span class="comment"># print(response.text)</span></span><br><span class="line"><span class="comment"># response.text:返回的是一个经过解码后的字符串，是str（Unicode）类型</span></span><br><span class="line"><span class="comment"># response.content:返回的是一个原生字符串，就是从网页上抓取下来的，没有经过处理的字符串，是bytes类型</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 2. 将抓取下来的数据根据一定的规则进行抓取</span></span><br><span class="line"><span class="attr">html</span> = etree.HTML(text)</span><br><span class="line"><span class="attr">ul</span> = html.xpath(<span class="string">"//ul[@class='lists']"</span>)[<span class="number">0</span>]</span><br><span class="line"><span class="attr">lis</span> = ul.xpath(<span class="string">"./li"</span>)</span><br><span class="line"><span class="attr">movies</span> = []</span><br><span class="line">for li <span class="keyword">in</span> lis:</span><br><span class="line">    <span class="attr">title</span> = li.xpath(<span class="string">"@data-title"</span>)[<span class="number">0</span>]</span><br><span class="line">    <span class="attr">score</span> = li.xpath(<span class="string">"@data-score"</span>)[<span class="number">0</span>]</span><br><span class="line">    <span class="attr">duration</span> = li.xpath(<span class="string">"@data-duration"</span>)[<span class="number">0</span>]</span><br><span class="line">    <span class="attr">region</span> = li.xpath(<span class="string">"@data-region"</span>)[<span class="number">0</span>]</span><br><span class="line">    <span class="attr">director</span> = li.xpath(<span class="string">"@data-director"</span>)[<span class="number">0</span>]</span><br><span class="line">    <span class="attr">actors</span> = li.xpath(<span class="string">"@data-actors"</span>)[<span class="number">0</span>]</span><br><span class="line">    <span class="attr">thumbnail</span> = li.xpath(<span class="string">".//img/@src"</span>)[<span class="number">0</span>]</span><br><span class="line">    <span class="attr">movie</span> = &#123;</span><br><span class="line">        'title': title,</span><br><span class="line">        'score': score,</span><br><span class="line">        'duration': duration,</span><br><span class="line">        'region': region,</span><br><span class="line">        'director': director,</span><br><span class="line">        'actors': actors,</span><br><span class="line">        'thumbnail': thumbnail</span><br><span class="line">    &#125;</span><br><span class="line">    movies.append(movie)</span><br><span class="line"></span><br><span class="line">print(movies)</span><br><span class="line"></span><br></pre></td></tr></table></figure></p>
+<h1 id="爬取效果"><a href="#爬取效果" class="headerlink" title="爬取效果"></a>爬取效果</h1><p><img src="https://i.loli.net/2019/08/15/T5UkQ78jmSC1cAq.jpg" alt=""><br>
+        <div id="aplayer-hBNiNlNk" class="aplayer aplayer-tag-marker" style="margin-bottom: 20px;">
+            <pre class="aplayer-lrc-content"></pre>
+        </div>
+        <script>
+          var ap = new APlayer({
+            element: document.getElementById("aplayer-hBNiNlNk"),
+            narrow: false,
+            autoplay: true,
+            showlrc: false,
+            music: {
+              title: "抖音热曲",
+              author: "随机",
+              url: "https://www.lori.tw/dyph.php",
+              pic: "https://i.loli.net/2019/03/07/5c80ce3a5aac4.png",
+              lrc: ""
+            }
+          });
+          window.aplayers || (window.aplayers = []);
+          window.aplayers.push(ap);
+        </script></p>
+</article><!-- lincense--><div class="license-wrapper"><p> <span>Author:  </span><a href="http://JaneBraun.github.io">云亦然</a></p><p> <span>Link:  </span><a href="http://JaneBraun.github.io/2019/08/07/Python爬取豆瓣正在热映/">http://JaneBraun.github.io/2019/08/07/Python爬取豆瓣正在热映/</a></p><p> <span>Copyright:  </span><span>All articles in this blog are licensed under <a rel="license" href="https://creativecommons.org/licenses/by-nc-nd/3.0">CC BY-NC-SA 3.0</a> unless stating additionally.</span></p></div><div class="post-paginator"><a class="prevSlogan" href="/2019/08/15/网络安全之命令逻辑漏洞/" title="网络安全之命令逻辑漏洞"><span>< PreviousPost</span><br><span class="prevTitle">网络安全之命令逻辑漏洞</span></a><a class="nextSlogan" href="/2019/08/02/Samba服务器架设/" title="Samba服务器架设"><span>NextPost ></span><br><span class="nextTitle">Samba服务器架设</span></a><div class="clear"></div></div><div id="comment"><div id="container"></div><link rel="stylesheet" href="https://jjeejj.github.io/css/gitment.css"><script src="https://jjeejj.github.io/js/gitment.js"></script><script>var gitment = new Gitment({
+  id: 'Python爬取豆瓣正在热映',
+  owner: 'JaneBraun',
+  repo: 'JaneBraun.github.io',
+  oauth: {
+    client_id: '0a088938e28067a01cb2',
+    client_secret: '5ce5adee232943d97b6823758c846e3d0edc3eed',
+  },
+})
+gitment.render('container')</script></div></section></article><footer id="cxo-footer-outer"><div id="cxo-footer-inner"><p class="footer-container"><script src="https://mkblog.cn/blog/demo/motto/js.php"> </script></p><p class="footer-container"><span>Site by </span><a href="http://hexo.io"><span>Hexo</span></a><span> | theme </span><a href="https://github.com/Longlongyu/hexo-theme-Cxo"><span>Cxo</span></a></p><i class="fa fa-user"> </i><span>本站访客数</span><span id="busuanzi_value_site_uv"></span><span> | </span><i class="fa fa-eye"> </i><span>本站访问量</span><span id="busuanzi_value_site_pv"></span></div></footer><!-- catelog--><div class="toc-wrapper" style="top: 70vh;"><div class="toc-catalog"><i class="fa fa-list"> </i><span>CATALOG</span></div><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#Python爬取豆瓣正在热映的电影信息"><span class="toc-number">1.</span> <span class="toc-text">Python爬取豆瓣正在热映的电影信息</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#爬取效果"><span class="toc-number">2.</span> <span class="toc-text">爬取效果</span></a></li></ol></div><!-- top--><i class="fa fa-arrow-up close" id="go-up" aria-hidden="true"></i><script src="/live2d-widget/lib/L2Dwidget.min.js?0c58a1486de42ac6cc1c59c7d98ae887"></script><script>L2Dwidget.init({"pluginRootPath":"live2d-widget/","pluginJsPath":"lib/","pluginModelPath":"assets/","tagMode":false,"debug":false,"model":{"jsonPath":"/live2d-widget/assets/assets/haruto.model.json"},"display":{"position":"right","width":150,"height":300},"mobile":{"show":true,"scale":0.5},"react":{"opacityDefault":0.7,"opacityOnHover":0.2},"log":false});</script></body></html>

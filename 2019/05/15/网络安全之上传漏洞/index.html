@@ -1,0 +1,150 @@
+<!DOCTYPE html><html><head><meta name="generator" content="Hexo 3.8.0"><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no"><meta name="author" content="云亦然"><meta name="renderer" content="webkit"><meta name="baidu-site-verification" content="Gp9ShUqSBW"><meta name="google-site-verification" content="vnHxw9xKnwp2dRWqAPmI-QTMJvCDfbXRuoMzb2RbHZw"><meta name="copyright" content="云亦然"><meta name="keywords" content="Hexo"><meta name="description" content="null"><meta name="Cache-Control" content="no-cache"><meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"><title>网络安全之上传漏洞 · 云亦然's Blog</title><link rel="stylesheet" href="/css/style.css?v=2018.7.9"><link rel="stylesheet" href="/css/animation.css?v=2018.7.9"><link rel="icon" href="/source/img/assets/favicon.ico"><link rel="stylesheet" href="https://cdn.bootcss.com/font-awesome/4.7.0/css/font-awesome.min.css?version=1.5.6"><!-- scripts--><script>(function( w ){
+  "use strict";
+  // rel=preload support test
+  if( !w.loadCSS ){
+    w.loadCSS = function(){};
+  }
+  // define on the loadCSS obj
+  var rp = loadCSS.relpreload = {};
+  // rel=preload feature support test
+  // runs once and returns a function for compat purposes
+  rp.support = (function(){
+    var ret;
+    try {
+      ret = w.document.createElement( "link" ).relList.supports( "preload" );
+    } catch (e) {
+      ret = false;
+    }
+    return function(){
+      return ret;
+    };
+  })();
+
+  // if preload isn't supported, get an asynchronous load by using a non-matching media attribute
+  // then change that media back to its intended value on load
+  rp.bindMediaToggle = function( link ){
+    // remember existing media attr for ultimate state, or default to 'all'
+    var finalMedia = link.media || "all";
+
+    function enableStylesheet(){
+      link.media = finalMedia;
+    }
+
+    // bind load handlers to enable media
+    if( link.addEventListener ){
+      link.addEventListener( "load", enableStylesheet );
+    } else if( link.attachEvent ){
+      link.attachEvent( "onload", enableStylesheet );
+    }
+
+    // Set rel and non-applicable media type to start an async request
+    // note: timeout allows this to happen async to let rendering continue in IE
+    setTimeout(function(){
+      link.rel = "stylesheet";
+      link.media = "only x";
+    });
+    // also enable media after 3 seconds,
+    // which will catch very old browsers (android 2.x, old firefox) that don't support onload on link
+    setTimeout( enableStylesheet, 3000 );
+  };
+
+  // loop through link elements in DOM
+  rp.poly = function(){
+    // double check this to prevent external calls from running
+    if( rp.support() ){
+      return;
+    }
+    var links = w.document.getElementsByTagName( "link" );
+    for( var i = 0; i < links.length; i++ ){
+      var link = links[ i ];
+      // qualify links to those with rel=preload and as=style attrs
+      if( link.rel === "preload" && link.getAttribute( "as" ) === "style" && !link.getAttribute( "data-loadcss" ) ){
+        // prevent rerunning on link
+        link.setAttribute( "data-loadcss", true );
+        // bind listeners to toggle media back
+        rp.bindMediaToggle( link );
+      }
+    }
+  };
+
+  // if unsupported, run the polyfill
+  if( !rp.support() ){
+    // run once at least
+    rp.poly();
+
+    // rerun poly on an interval until onload
+    var run = w.setInterval( rp.poly, 500 );
+    if( w.addEventListener ){
+      w.addEventListener( "load", function(){
+        rp.poly();
+        w.clearInterval( run );
+      } );
+    } else if( w.attachEvent ){
+      w.attachEvent( "onload", function(){
+        rp.poly();
+        w.clearInterval( run );
+      } );
+    }
+  }
+
+
+  // commonjs
+  if( typeof exports !== "undefined" ){
+    exports.loadCSS = loadCSS;
+  }
+  else {
+    w.loadCSS = loadCSS;
+  }
+}( typeof global !== "undefined" ? global : this ) );</script><script src="https://cdn.jsdelivr.net/npm/jquery@3.3.1/dist/jquery.min.js" defer></script><script src="/js/main.js?v=2018.7.9" defer></script><!-- fancybox--><link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.2.5/jquery.fancybox.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'"><script src="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.2.5/jquery.fancybox.min.js" defer></script><!-- busuanzi--><script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script><link rel="stylesheet" href="\assets\css\APlayer.min.css" class="aplayer-style-marker">
+<script src="\assets\js\APlayer.min.js" class="aplayer-script-marker"></script>
+</head><body><section class="profile-close" id="cxo-profile"><div class="profile-avatar"><i class="fa fa-caret-left"></i><img src="https://i.loli.net/2019/03/07/5c809e0647313.jpg"></div><!--.profile-saying
+  i.fa.fa-comment
+  .saying--><div class="cxo-profile-inner"><div class="profile-name">云亦然</div><div class="profile-signature">天下皆白，唯我独黑。非攻墨门，兼爱平生。</div><div class="friends"><div>FRIENDS</div><span><a href="//www.hxsgyl.top" target="_black">忘年</a></span><span><a href="//bbs.88hack.com/" target="_black">极安中国</a></span><span><a href="//www.soul666.com/" target="_black">Soul博客</a></span></div><div class="read-progress"></div></div></section><header id="cxo-intro" style="height: 70vh;background-image: url(https://api.r10086.com/动漫综合2.php);"><nav id="cxo-intro-nav"><section><div class="intro-nav-title"><a href="/">云亦然's Blog</a></div><div class="intro-nav-label-box"><a href="/">Home</a><a href="/about/">About</a><a href="/archives/">Archives</a><a href="/tags/">Tags</a></div><i class="fa fa-bars intro-nav-menu"><div class="intro-nav-drop"><a href="/">Home</a><a href="/about/">About</a><a href="/archives/">Archives</a><a href="/tags/">Tags</a></div></i><div class="clear"></div></section></nav><h1 class="post-title">网络安全之上传漏洞</h1><div class="post-intros"><div class="post-intro-meta"><span class="post-intro-time"><i class="post-intro-calendar fa fa-calendar"></i><span>2019-05-15 16:10:12</span></span><span class="post-intro-tags"><a class="intro-tag fa fa-tag" href="javascript:void(0)" date-tags="网络安全"> 网络安全</a></span></div><div class="post-intro-read"><span> Word count: <span class="post-count">981</span> | Reading time: <span class="post-count">3</span>min</span></div></div></header><article class="cxo-up" id="cxo-content-outer"><section id="cxo-content-inner"><article class="article-entry" id="post"><h1 id="上传漏洞"><a href="#上传漏洞" class="headerlink" title="上传漏洞"></a>上传漏洞</h1><p>在网站的运营过程中，不可避免地要<br>对网站的某些页面或者内容进行更新，<br>这时便需要使用到网站的文件上传的功能。<br>如果不对被上传的文件进行限制或者限制被绕过，<br>该功能便有可能会被利用于上传可执行文件、脚本到服务器上，<br>进而进一步导致服务器沦陷。</p>
+<h1 id="常见的漏洞分类："><a href="#常见的漏洞分类：" class="headerlink" title="常见的漏洞分类："></a>常见的漏洞分类：</h1><pre><code>服务器配置不当导致文件上传
+开源编辑器存在上传漏洞
+本地文件上传限制可以被绕过
+服务端过滤不严可以被绕过
+解析漏洞导致的文件执行
+文件路径截断
+</code></pre><h1 id="上传漏洞的利用成果"><a href="#上传漏洞的利用成果" class="headerlink" title="上传漏洞的利用成果:"></a>上传漏洞的利用成果:</h1><pre><code>较为快速、直接地获取网站的web权限
+配合其他漏洞达到同样获取网站权限的目的
+为后续进一步渗透提供较方便的跳板
+</code></pre><h1 id="ISS写权限漏洞"><a href="#ISS写权限漏洞" class="headerlink" title="ISS写权限漏洞"></a>ISS写权限漏洞</h1><p><strong>漏洞成因</strong><br>    在服务器配置不当的时候，<br>    可能上传文件的页面都不需要，<br>    就可以实现文件上传功能。<br>    一般都是http请求put方法。<br>    当然web服务器默认是不开启PUT等方法的，<br>    出现该漏洞的原因主要是网站管理员对服务器的错误配置</p>
+<p>常见的主要就是管理员错误地打开了IIS的服务器的WEBDAV而且没有开启验证，<br>导致可以PUT文件到服务器再利用服务器的解析漏洞运行恶意代码<br>或用WEBDAV的MOVE方法将所上传的带有恶意代码的普通文件后缀修改为可执行文件后缀，<br>运行恶意代码<br>网络上已经有了利用工具，利用手段也十分简单。</p>
+<p><strong>漏洞验证</strong><br>漏洞验证：主要检测是否开启put，move，copy等方法<br>漏洞利用-从写权限到文件上传<br>1、PUT一个txt文件到服务器上<br>2、把文件MOVE成IIS可解析的脚本类型文件</p>
+<h1 id="解析漏洞"><a href="#解析漏洞" class="headerlink" title="解析漏洞"></a>解析漏洞</h1><p><strong>漏洞成因</strong><br>解析漏洞：<br>    是指web服务器因对http请求处理不当导致，<br>    将不允许可执行的脚本，<br>    文件等当作可执行的脚本，文件等执行。<br>    该漏洞一般配合服务器的文件上传功能，以获取服务器的权限。</p>
+<p>解析漏洞分类：<br>    IIS 5.x/6.0解析漏洞<br>    IIS 7.0/IIS 7.5/Nginx &lt;0.8.3畸形解析漏洞<br>    Nginx &lt;8.03空字节代码执行漏洞<br>        在Fast-CGI关闭的情况下，Nginx&lt;8.03依然存在解析漏洞在一个文件路径(/xx.jpg)后面加上%00.php会将/.xx.jpg%00.php解析为php文件。<br>    Apache解析漏洞<br>        apache以moudule模式结合php存在解析漏洞，Apache是从右到左开始判断解析，如果为不可识别解析，就再往左判断。1.php.xxx.aaa<br>    CVE-2013-4547 Nginx解析漏洞</p>
+<h1 id="文件上传漏洞"><a href="#文件上传漏洞" class="headerlink" title="文件上传漏洞"></a>文件上传漏洞</h1><p><strong>漏洞成因</strong><br>上传的文件仅经过javascript的验证（客户本地验证），仅客户端验证是不安全<br>程序员写代码的时候考虑不周全，或仅设置黑名单白名单等方式，<br>或目录参数传递可控，或者验证方式可以被绕过等等。</p>
+<p>传统的验证手段:<br>    没有任何验证<br>    JS验证<br>    MIME类型验证<br>    后缀验证<br>    文件内容验证</p>
+<h1 id="开源编辑器的上传漏洞"><a href="#开源编辑器的上传漏洞" class="headerlink" title="开源编辑器的上传漏洞"></a>开源编辑器的上传漏洞</h1><p><strong>漏洞成因</strong><br>程序员在编写上传验证代码时，考虑得不是很周全，过滤不严格从而造成了，编辑器也同样存在上传漏洞。</p>
+<p>编辑器种类:<br>    1.eWebEditor<br>    2.FCKeditor<br>    3.Kindeditor</p>
+
+        <div id="aplayer-opGZDDCa" class="aplayer aplayer-tag-marker" style="margin-bottom: 20px;">
+            <pre class="aplayer-lrc-content"></pre>
+        </div>
+        <script>
+          var ap = new APlayer({
+            element: document.getElementById("aplayer-opGZDDCa"),
+            narrow: false,
+            autoplay: true,
+            showlrc: false,
+            music: {
+              title: "抖音新曲",
+              author: "随机",
+              url: "https://www.lori.tw/dyph.php",
+              pic: "https://i.loli.net/2019/03/07/5c80ce3a5aac4.png",
+              lrc: ""
+            }
+          });
+          window.aplayers || (window.aplayers = []);
+          window.aplayers.push(ap);
+        </script></article><!-- lincense--><div class="license-wrapper"><p> <span>Author:  </span><a href="http://JaneBraun.github.io">云亦然</a></p><p> <span>Link:  </span><a href="http://JaneBraun.github.io/2019/05/15/网络安全之上传漏洞/">http://JaneBraun.github.io/2019/05/15/网络安全之上传漏洞/</a></p><p> <span>Copyright:  </span><span>All articles in this blog are licensed under <a rel="license" href="https://creativecommons.org/licenses/by-nc-nd/3.0">CC BY-NC-SA 3.0</a> unless stating additionally.</span></p></div><div class="post-paginator"><a class="prevSlogan" href="/2019/05/31/网络安全之业务逻辑漏洞/" title="网络安全之业务逻辑漏洞"><span>< PreviousPost</span><br><span class="prevTitle">网络安全之业务逻辑漏洞</span></a><a class="nextSlogan" href="/2019/04/19/网络安全之XXS攻击/" title="网络安全之XXS攻击"><span>NextPost ></span><br><span class="nextTitle">网络安全之XXS攻击</span></a><div class="clear"></div></div><div id="comment"><div id="container"></div><link rel="stylesheet" href="https://jjeejj.github.io/css/gitment.css"><script src="https://jjeejj.github.io/js/gitment.js"></script><script>var gitment = new Gitment({
+  id: '网络安全之上传漏洞',
+  owner: 'JaneBraun',
+  repo: 'JaneBraun.github.io',
+  oauth: {
+    client_id: '0a088938e28067a01cb2',
+    client_secret: '5ce5adee232943d97b6823758c846e3d0edc3eed',
+  },
+})
+gitment.render('container')</script></div></section></article><footer id="cxo-footer-outer"><div id="cxo-footer-inner"><p class="footer-container"><script src="https://mkblog.cn/blog/demo/motto/js.php"> </script></p><p class="footer-container"><span>Site by </span><a href="http://hexo.io"><span>Hexo</span></a><span> | theme </span><a href="https://github.com/Longlongyu/hexo-theme-Cxo"><span>Cxo</span></a></p><i class="fa fa-user"> </i><span>本站访客数</span><span id="busuanzi_value_site_uv"></span><span> | </span><i class="fa fa-eye"> </i><span>本站访问量</span><span id="busuanzi_value_site_pv"></span></div></footer><!-- catelog--><div class="toc-wrapper" style="top: 70vh;"><div class="toc-catalog"><i class="fa fa-list"> </i><span>CATALOG</span></div><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#上传漏洞"><span class="toc-number">1.</span> <span class="toc-text">上传漏洞</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#常见的漏洞分类："><span class="toc-number">2.</span> <span class="toc-text">常见的漏洞分类：</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#上传漏洞的利用成果"><span class="toc-number">3.</span> <span class="toc-text">上传漏洞的利用成果:</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#ISS写权限漏洞"><span class="toc-number">4.</span> <span class="toc-text">ISS写权限漏洞</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#解析漏洞"><span class="toc-number">5.</span> <span class="toc-text">解析漏洞</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#文件上传漏洞"><span class="toc-number">6.</span> <span class="toc-text">文件上传漏洞</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#开源编辑器的上传漏洞"><span class="toc-number">7.</span> <span class="toc-text">开源编辑器的上传漏洞</span></a></li></ol></div><!-- top--><i class="fa fa-arrow-up close" id="go-up" aria-hidden="true"></i><script src="/live2d-widget/lib/L2Dwidget.min.js?0c58a1486de42ac6cc1c59c7d98ae887"></script><script>L2Dwidget.init({"pluginRootPath":"live2d-widget/","pluginJsPath":"lib/","pluginModelPath":"assets/","tagMode":false,"debug":false,"model":{"jsonPath":"/live2d-widget/assets/assets/haruto.model.json"},"display":{"position":"right","width":150,"height":300},"mobile":{"show":true,"scale":0.5},"react":{"opacityDefault":0.7,"opacityOnHover":0.2},"log":false});</script></body></html>

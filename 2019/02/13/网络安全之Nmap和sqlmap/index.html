@@ -1,0 +1,273 @@
+<!DOCTYPE html><html><head><meta name="generator" content="Hexo 3.8.0"><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no"><meta name="author" content="云亦然"><meta name="renderer" content="webkit"><meta name="baidu-site-verification" content="Gp9ShUqSBW"><meta name="google-site-verification" content="vnHxw9xKnwp2dRWqAPmI-QTMJvCDfbXRuoMzb2RbHZw"><meta name="copyright" content="云亦然"><meta name="keywords" content="Hexo"><meta name="description" content="null"><meta name="Cache-Control" content="no-cache"><meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"><title>网络安全之Nmap和sqlmap · 云亦然's Blog</title><link rel="stylesheet" href="/css/style.css?v=2018.7.9"><link rel="stylesheet" href="/css/animation.css?v=2018.7.9"><link rel="icon" href="/source/img/assets/favicon.ico"><link rel="stylesheet" href="https://cdn.bootcss.com/font-awesome/4.7.0/css/font-awesome.min.css?version=1.5.6"><!-- scripts--><script>(function( w ){
+  "use strict";
+  // rel=preload support test
+  if( !w.loadCSS ){
+    w.loadCSS = function(){};
+  }
+  // define on the loadCSS obj
+  var rp = loadCSS.relpreload = {};
+  // rel=preload feature support test
+  // runs once and returns a function for compat purposes
+  rp.support = (function(){
+    var ret;
+    try {
+      ret = w.document.createElement( "link" ).relList.supports( "preload" );
+    } catch (e) {
+      ret = false;
+    }
+    return function(){
+      return ret;
+    };
+  })();
+
+  // if preload isn't supported, get an asynchronous load by using a non-matching media attribute
+  // then change that media back to its intended value on load
+  rp.bindMediaToggle = function( link ){
+    // remember existing media attr for ultimate state, or default to 'all'
+    var finalMedia = link.media || "all";
+
+    function enableStylesheet(){
+      link.media = finalMedia;
+    }
+
+    // bind load handlers to enable media
+    if( link.addEventListener ){
+      link.addEventListener( "load", enableStylesheet );
+    } else if( link.attachEvent ){
+      link.attachEvent( "onload", enableStylesheet );
+    }
+
+    // Set rel and non-applicable media type to start an async request
+    // note: timeout allows this to happen async to let rendering continue in IE
+    setTimeout(function(){
+      link.rel = "stylesheet";
+      link.media = "only x";
+    });
+    // also enable media after 3 seconds,
+    // which will catch very old browsers (android 2.x, old firefox) that don't support onload on link
+    setTimeout( enableStylesheet, 3000 );
+  };
+
+  // loop through link elements in DOM
+  rp.poly = function(){
+    // double check this to prevent external calls from running
+    if( rp.support() ){
+      return;
+    }
+    var links = w.document.getElementsByTagName( "link" );
+    for( var i = 0; i < links.length; i++ ){
+      var link = links[ i ];
+      // qualify links to those with rel=preload and as=style attrs
+      if( link.rel === "preload" && link.getAttribute( "as" ) === "style" && !link.getAttribute( "data-loadcss" ) ){
+        // prevent rerunning on link
+        link.setAttribute( "data-loadcss", true );
+        // bind listeners to toggle media back
+        rp.bindMediaToggle( link );
+      }
+    }
+  };
+
+  // if unsupported, run the polyfill
+  if( !rp.support() ){
+    // run once at least
+    rp.poly();
+
+    // rerun poly on an interval until onload
+    var run = w.setInterval( rp.poly, 500 );
+    if( w.addEventListener ){
+      w.addEventListener( "load", function(){
+        rp.poly();
+        w.clearInterval( run );
+      } );
+    } else if( w.attachEvent ){
+      w.attachEvent( "onload", function(){
+        rp.poly();
+        w.clearInterval( run );
+      } );
+    }
+  }
+
+
+  // commonjs
+  if( typeof exports !== "undefined" ){
+    exports.loadCSS = loadCSS;
+  }
+  else {
+    w.loadCSS = loadCSS;
+  }
+}( typeof global !== "undefined" ? global : this ) );</script><script src="https://cdn.jsdelivr.net/npm/jquery@3.3.1/dist/jquery.min.js" defer></script><script src="/js/main.js?v=2018.7.9" defer></script><!-- fancybox--><link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.2.5/jquery.fancybox.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'"><script src="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.2.5/jquery.fancybox.min.js" defer></script><!-- busuanzi--><script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script><link rel="stylesheet" href="\assets\css\APlayer.min.css" class="aplayer-style-marker">
+<script src="\assets\js\APlayer.min.js" class="aplayer-script-marker"></script>
+</head><body><section class="profile-close" id="cxo-profile"><div class="profile-avatar"><i class="fa fa-caret-left"></i><img src="https://i.loli.net/2019/03/07/5c809e0647313.jpg"></div><!--.profile-saying
+  i.fa.fa-comment
+  .saying--><div class="cxo-profile-inner"><div class="profile-name">云亦然</div><div class="profile-signature">天下皆白，唯我独黑。非攻墨门，兼爱平生。</div><div class="friends"><div>FRIENDS</div><span><a href="//www.hxsgyl.top" target="_black">忘年</a></span><span><a href="//bbs.88hack.com/" target="_black">极安中国</a></span><span><a href="//www.soul666.com/" target="_black">Soul博客</a></span></div><div class="read-progress"></div></div></section><header id="cxo-intro" style="height: 70vh;background-image: url(https://api.r10086.com/动漫综合2.php);"><nav id="cxo-intro-nav"><section><div class="intro-nav-title"><a href="/">云亦然's Blog</a></div><div class="intro-nav-label-box"><a href="/">Home</a><a href="/about/">About</a><a href="/archives/">Archives</a><a href="/tags/">Tags</a></div><i class="fa fa-bars intro-nav-menu"><div class="intro-nav-drop"><a href="/">Home</a><a href="/about/">About</a><a href="/archives/">Archives</a><a href="/tags/">Tags</a></div></i><div class="clear"></div></section></nav><h1 class="post-title">网络安全之Nmap和sqlmap</h1><div class="post-intros"><div class="post-intro-meta"><span class="post-intro-time"><i class="post-intro-calendar fa fa-calendar"></i><span>2019-02-13 10:15:45</span></span><span class="post-intro-tags"><a class="intro-tag fa fa-tag" href="javascript:void(0)" date-tags="网络安全"> 网络安全</a></span></div><div class="post-intro-read"><span> Word count: <span class="post-count">3.8k</span> | Reading time: <span class="post-count">14</span>min</span></div></div></header><article class="cxo-up" id="cxo-content-outer"><section id="cxo-content-inner"><article class="article-entry" id="post"><p>什么是网络扫描？<br>    通过主动发送相关数据包进行网络探测，<br>    识别、分析返回的信息，用以确认网络目标的相关特征。</p>
+<p>为什么要做网络扫描？<br>     安全测试中信息收集的一部分，<br>    主动探测收集目标信息，<br>    为后续的漏洞分析和利用做准备。</p>
+<p>Nmap在网络扫描中的常见作用：<br>    1、查看存活主机。<br>    2、扫描目标主机开放端口。<br>    3、鉴别安全过滤机制。<br>    4、识别目标主机的操作系统。<br>    5、查看目标主机服务的版本信息。<br>    6、利用脚本扫描漏洞。<br><img src="https://i.loli.net/2019/03/07/5c80a44990dd3.jpg" alt="nmap.jpg"><br>Nmap简介：<br>    Nmap也称NetworkMapper,<br>    是一款多平台的网络连接扫描软件，<br>    可以探测计算机网络上的主机和服务。<br>    在渗透初期为了绘制目标网络拓补图，<br>    需用到Nmap对目标网络发送特定的数据包，<br>    对返回的数据包进行分析。</p>
+<p>Nmap主要适用平台：<br>    Windows系统、Mac OS X系统、Linux系统</p>
+<p>Nmap常见运行方式:<br>    Zenmap GUI方式<br>    命令行方式</p>
+<p>Nmap主要参数介绍</p>
+<p>Nmap的功能参数主要分为以下几个大类：<br>    1、目标说明<br>    2、主机发现<br>    3、端口扫描<br>    4、端口说明和扫描顺序<br>    5、服务与版本探测<br>    6、脚本扫描<br>    7、操作系统探测<br>    8、时间和性能<br>    9、防火墙/IDS规避和欺骗<br>    10、输出选项<br>1、TARGET SPECIFICATION 目标说明</p>
+<pre><code>-iL 从主机地址列表文件中导入扫描地址
+-iR 随机选择目标进行扫描，num hosts表示数目
+--exclude 排除某个主机地址
+--excludefile 排除主机地址列表文件中的地址
+</code></pre><p>2、HOST DISCOVERY  主机发现</p>
+<pre><code>-sL 列表扫描，仅将指定的目标IP列举出来，不进行主机发现
+-sn 和 -sP一样，只利用ping扫描进行主机发现，不扫描目标主机的端口
+-Pn 将所有指定的主机视为已开启状态，跳过主机发现过程
+-PS TCP SYN ping ，发送一个设置了SYN标志位的空TCP报文，默认端口为80，也可指定端口
+-PA TCP ACK ping ，发送一个设置了ACK标志位的空TCP报文，默认端口为80，也可指定端口
+-PU UDP ping ， 发送一个空的UDP报文到指定端口，可穿透只过滤TCP的防火墙
+-P0 使用IP协议ping
+-PR 使用ARP ping
+-n/-R -n不用域名解析，加速扫描，-R为目标IP做反向域名解析，扫描较慢一些
+-dns-servers 自定义域名解析服务器地址
+-traceroute 目标主机路由追踪
+</code></pre><p>3、SCAN TECHNIQUES  端口扫描</p>
+<pre><code>Nmap将目标端口分为6种状态：
+-open（开放的）
+-closed（关闭的）
+-filtered（被过滤的）
+-unfiltered（未被过滤）可访问但不确定开发情况
+-open|filtered（开放或者被过滤）无法确定端口是开放的还是被过滤的
+-closed|filtered（关闭或者被过滤）无法确定端口是关闭的还是被过滤的
+Nmap产生结果是基于目标机器的响应报文的，而这些主机可能是不可信任的，会产生迷惑或者误导Nmap的报文。
+-sS TCP SYN扫描，半开放扫描，速度快隐蔽性好（不完成TCP连接），能够明确区分端口状态
+-sT  TCP连接扫描，容易产生记录，效率低
+-sA TCP ACK扫描，只设置ACK标志位，区别被过滤与未被过滤的
+-sU UDP服务扫描，例如DNS/DHCP等，效率低
+</code></pre><p>4、PORT SPECIFICATION AND SCAN ORDER  端口说明和扫描顺序</p>
+<pre><code>-p 指定扫描的端口，可以是单个端口，也可以是端口范围，可以指定UDP或TCP协议扫描特定端口
+-p&lt;name&gt; 指定扫描的协议，例如-p http 即可扫描http协议的端口状态
+--exclude-ports  排除指定端口不扫描
+-F 快速模式，仅扫描100个常用端口
+</code></pre><p>5、SERVICE/VERSION DETECTION  服务与版本探测</p>
+<pre><code>Nmap-services 包含大量服务的数据库，Nmap通过查询该数据库可以报告哪些端口可能对应于什么服务，但不一定确定。
+-sV 进行服务版本探测
+--vesion-intensity&lt;level&gt; 设置版本扫描强度，范围为0-9，默认是7，强度越高，时间越长，服务越可能被正确识别
+</code></pre><p>6、SCRIPT SCAN 脚本扫描</p>
+<pre><code>允许用户自己编写脚本来执行自动化的操作或者扩展Nmap的功能，使用Lua脚本语言。
+-sC 使用默认类别的脚本进行扫描
+--script=&lt;Lua script&gt;  使用某个或某类脚本进行扫描，支持通配符描述
+</code></pre><p>7、OS DETECTION 操作系统探测</p>
+<pre><code>用TCP/IP协议栈fingerprinting进行探测，
+Nmap发送一系列TCP和UDP报文到远程主机，
+检查响应中的每一个比特。
+测试后Nmap把结果和数据库中超过1500个已知的fingerprints比较，如匹配则输出结果。
+-O 启用操作系统探测
+-A 同时启用操作系统探测和服务版本探测
+--osscan-limit 针对指定的目标进行操作系统探测
+--osscan-guess 当Nmap无法确定所检测的操作系统时，会尽可能地提供最相近的匹配
+</code></pre><p>8、TIMING AND PERFORMANCE 时间和性能</p>
+<pre><code>Nmap开发的最高优先级是性能，
+但实际应用中很多因素会增加扫描时间，
+比如特定的扫描选项，防火墙配置以及版本扫描等。
+-T&lt;0-5&gt; 设置时间模板级数，在0-5中选择。
+T0、T1用于IDS规避，T2降低了扫描速度以使用更少的带宽和资源。
+默认为T3，未做任何优化。T4假设具有合适及可靠的网络从而加速扫描。
+T5假设具有特别快的网络或者愿为速度牺牲准确性
+-host-timeout&lt;time&gt; 放弃低速目标主机，时间单位为毫秒
+</code></pre><p>9、FIREWALL/IDS EVASION AND SPOOFING 防火墙/IDS规避和欺骗<br>    -f（报文分段）；–mtu（使用指定的MTU）将TCP头分段在几个包中，使得包过滤器、IDS以及其他工具的检测更加困难<br>    -D&lt;decoy1[,decoy2][,ME]…&gt; 隐蔽扫描；使用逗号分隔每个诱饵主机，用自己真实IP作为诱饵使用ME选项。<br>    如在6号或更后的位置使用ME选项，一些检测器就不报告真实IP。如不使用ME，真实IP将随机放置<br>    -S&lt;IP_Address&gt; 伪造数据包的源地址<br>    -source-port<portnumber>/-g<portnumber> 伪造源端口</portnumber></portnumber></p>
+<p>10、OUTPUT 输出选项</p>
+<pre><code>-oN 标准输出
+-oX XML输出写入指定的文件
+-oS 脚本小子输出，类似于交互工具输出
+-oG Grep输出
+-oA 输出至所有格式
+-v  提高输出信息的详细度
+-resume&lt;filename&gt; 继续中断的扫描
+</code></pre><p>Nmap的常用扫描技巧：<br>1、扫描单一目标主机<br>    nmap 192.168.0.1<br>    nmap xxx.com<br>    （默认发送一个ARP的PING包，扫描1-10000范围内开放端口）</p>
+<p>2、扫描整个子网<br>    nmap 192.168.0.1/24</p>
+<p>3、扫描多个目标<br>    nmap 192.168.0.1 xxx.com</p>
+<p>4、扫描一个范围内的目标<br>    nmap 192.168.0.1-200</p>
+<p>5、导入IP列表进行扫描<br>    nmap -iL ip.txt(在Nmap目录下)</p>
+<p>6、列举目标地址，但不进行扫描<br>    nmap -sL 192.168.0.1/24</p>
+<p>7、排除某IP进行扫描<br>    nmap 192.168.0.1/24 -exclude 192.168.0.1<br>    nmap 192.168.0.1/24 -exclude file ip.txt</p>
+<p>8、扫描特定主机的特定端口<br>    nmap -p80，21，8080，135 192.168.0.1<br>    nmap -p50-900 192.168.0.1</p>
+<p>9、简单扫描，详细输出返回结果<br>    nmap -vv 192.168.0.1</p>
+<p>10、简单扫描并进行路由跟踪<br>    nmap -teaceroute baidu.com</p>
+<p>11、ping扫描，不扫描端口（需要root权限）<br>    nmap -sP 192.168.0.1<br>    nmap -sn 192.168.0.1</p>
+<p>12、探测操作系统类型<br>    nmap -O 192.168.0.1</p>
+<p>13、Nmap万能开关-A参数<br>    <img src="https://i.loli.net/2019/03/07/5c80a44a6680c.png" alt="nmap13.png"><br>    nmap -A 192.168.0.1<br>    -A 包含1-10000端口的ping扫描，操作系统扫描，脚本扫描，路由跟踪，服务探测</p>
+<p>14、混合命令扫描<br>    nmap -vv -p1-1000 -O 192.168.0.1/24 -exclude 192.168.0.1</p>
+<p>15、半开放TCP SYN端口扫描码<br>    <img src="https://i.loli.net/2019/03/07/5c80a449bd728.png" alt="nmap15.png"><br>    nmap -sS 192.168.0.1</p>
+<p>16、扫描UDP服务端口<br>    nmap -sU 192.168.0.1</p>
+<p>17、TCP连接扫描端口<br>    nmap -sT 192.168.0.1</p>
+<p>18、由于IDS/IPS系统的存在，防火墙可能会阻止掉<br>    SYN数据包，此时可发送设置了FIN标志的数据包，不需要完成TCP握手，不会再目标产生日志<br>    nmap -sF maizitime.com</p>
+<p>19、服务版本探测<br>    nmap -sV 192.168.0.1</p>
+<p>20、图形界面版本的对应使用</p>
+<p>Nmap脚本扫描<br>    Nmap允许用户自己编写脚本进行自动化扫描操作，或者扩展Nmap现有的功能<br>    脚本文件的默认目录为：/usr/share/nmap/scripts<br>    -sC 参数等价于 -sC=default 使用默认类别的脚本进行扫描，可更换其他脚本类别<br>    –script-args=&lt;n1=v1,[n2=v2,…]&gt;  为脚本提供默认参数<br>    –script-args-file=filename 使用文件来为脚本提供参数<br>    –script-updated 更新脚本数据库<br>    –script-trace 显示脚本执行过程中所有数据的发送与接收<br>    –script-help=<scripts> 显示脚本的帮助信息</scripts></p>
+<p>Nmap的脚本功能主要分为以下几类，扫描过程中可以使用-script=类别名称 这种方式进行扫描</p>
+<pre><code>auth：负责处理鉴权证书（绕开鉴权）的脚本
+broadcast：在局域网内探查更多服务开启状况，如dhcp/dns/sqlserver等服务
+brute：提供暴力破解方式，针对常见的应用如http/snmp等
+default：使用-sC或-A选项扫描时候默认的脚本，提供基本脚本扫描能力
+discovery：对网络进行更多的信息，如SMB枚举、SNMP查询等
+dos：用于进行拒绝服务攻击
+exploit：利用已知的漏洞入侵系统
+external：利用第三方的数据库或资源，例如进行whois解析
+fuzzer：模糊测试的脚本，发送异常的包到目标机，探测出潜在漏洞
+intrusive：入侵性的脚本，此类脚本可能引发对方的IDS/IPS的记录或屏蔽
+malware：探测目标机是否感染了病毒、开启了后门等信息
+safe：此类与intrusive相反，属于安全性脚本
+version：负责增强服务与版本扫描（Version Detection）功能的脚本
+vuln：负责检查目标机是否有常见的漏洞（Vulnerability），如是否有MS08_067
+
+使用auth类脚本进行扫描，处理鉴权证书方面的脚本，也可以作为部分弱口令的检测
+</code></pre><p>Nmap –script=auth<target ip=""></target></p>
+<p>使用默认脚本进行扫描</p>
+<p>Nmap -sC <target ip=""></target></p>
+<p>扫描是否存在常见漏洞</p>
+<p>Nmap –script=vuln <target ip=""></target></p>
+<p>在局域网内扫描更多的端口开启情况</p>
+<p>Nmap -n -p135 –script=broadcast <target ip=""></target></p>
+<hr>
+<p><img src="https://i.loli.net/2019/03/07/5c80a44984788.jpg" alt="sqlmap.jpg"><br>SqlMap是一款非常强大的开源SQL自动化注入工具，可以用来检测和利用SQL注入漏洞。<br>    获取SqlMap官网：<a href="http://www.sqlmap.org" target="_blank" rel="noopener">www.sqlmap.org</a></p>
+<p>SqlMap基于python编写，要求python的版本号为2.6或者2.7</p>
+<p>Sqlmap 目标 参数<br>    请求方式 注入类型<br>    系统选项 编码选项<br>    数据检索 文件读写<br>    数据保存 杂项</p>
+<p>Sqlmap检测注入点<br>    1、判断可注入的参数<br>    2、判断可以用哪种SQL注入技术来注入<br>    3、识别出哪种数据库<br>    4、根据用户选择，读取哪些数据</p>
+<p>Sqlmap支持五种不同的注入模式<br>    基于布尔的盲注，即可以根据返回页面判断条件真假的注入。<br>    基于时间的盲注，即不能根据页面返回内容判断任何信息，用条件语句查看时间延迟语句是否执行（即页面返回时间是否增加）来判断。<br>    基于报错注入，即页面会返回错误信息，或者把注入的语句的结果直接返回在页面中。<br>    联合查询注入，可以使用union的情况下的注入。<br>    堆查询注入，可以同时执行多条语句的执行时的注入。</p>
+<p>Sqlmap -u 目标url<br>Sqlmap -r 目标http请求<br><img src="https://i.loli.net/2019/03/07/5c80a44c2bc6c.png" alt="sqlmap1.png"><br>Sqlmap检测注入点<br>    读取数据库&gt;&gt;读取表&gt;&gt;读取列&gt;&gt;获取内容<br>    –dbs 列出所有的数据库<br>    –current-db 列出当前数据库<br>    –current-user 列出当前用户<br>    –table 列举数据库表名<br>    –columns 列举表列名<br>    –dump 获取表中的数据，包括列<br>    –is-dba 判断是否为管理员用户<br>    -D 指定数据库<br>    -T 指定表<br>    -C 指定列<br>    -p 指定参数<br><img src="https://i.loli.net/2019/03/07/5c80a44b40d78.png" alt="sqlmap2.png"><br>Sqlmap命令</p>
+<p>列数据库管理用户<br>参数：–users<br>当前用户有权限读取包含所有用户的表的权限时，就可以列出所有管理用户。</p>
+<p>列出并破解数据库用户的hash<br>参数：–passwords<br>当前用户有权限读取包含用户密码的彪的权限时，sqlmap会现列举出用户，然后列出hash，并尝试破解。</p>
+<p>列出数据库管理员权限<br>参数：–privileges<br>当前用户有权限读取包含所有用户的表的权限时，很可能列举出每个用户的权限，sqlmap将会告诉你哪个是数据库的超级管理员。</p>
+<p>获取表中数据个数<br>参数：–count<br>有时候用户只想获取表中的数据个数而不是具体内容，那么就可以使用这个参数。</p>
+<p>从数据库服务器中读取文件<br>参数：–file-read<br>当数据库为MySQL，PostgreSQL或Mircrosft SQL Server ，并且当前用户有权限使用特定的函数。读取的文件可以是文本也可以是二进制文件。</p>
+<p>把文件上传到数据库服务器中<br>参数：–file-write，–file-dest<br>当数据库为MySQL，PostgreSQL或Mircrosoft SQL Server，并且当前用户有权限使用特定的函数。上传的文件可以是文本也可以是二进制文件。<br>配置文件php-ini中（magic_quotes_gpc = off）</p>
+<p>HTTP请求延迟<br>参数：–delay<br>可以设定两个HTTP（S）请求间的延迟，设定为0.5的时候是半秒，默认是没有延迟的。</p>
+<p>设定超时时间<br>参数：–timeout<br>可以设定一个HTTP(S）请求超时多久判定为超时，10.5表示10.5秒，默认是30秒。</p>
+<p>运行自定义的SQL语句<br>参数：–sql-query，–sql-shell<br>sqlmap会自动检测确定使用哪种SQL注入技术，如何插入检索语句。</p>
+<p>运行任意操作系统命令<br>参数：–os-cmd，–os-shell<br>当数据库为MySQL，PostgreSQL或Microsoft SQL Server，并且当前用户有权限使用特定的函数。</p>
+<p>探测等级<br>参数：–level<br>共有五个等级，默认为1，如果你不确定那个payload或者参数为注入点的时候，为了保证全面性，建议使用高的level值。</p>
+<p>风险等级<br>参数：–risk<br>共有四个风险等级，默认是1会测试大部分的测试语句，2会增加基于事件的测试语句，3会增加OR语句的SQL注入测试。</p>
+<p>测试靶场为封神台;</p>
+
+        <div id="aplayer-kDPXDQxB" class="aplayer aplayer-tag-marker" style="margin-bottom: 20px;">
+            <pre class="aplayer-lrc-content"></pre>
+        </div>
+        <script>
+          var ap = new APlayer({
+            element: document.getElementById("aplayer-kDPXDQxB"),
+            narrow: false,
+            autoplay: true,
+            showlrc: false,
+            music: {
+              title: "网易云歌曲",
+              author: "随机",
+              url: "https://api.uomg.com/api/rand.music",
+              pic: "https://i.loli.net/2019/03/07/5c80ce3a5aac4.png",
+              lrc: ""
+            }
+          });
+          window.aplayers || (window.aplayers = []);
+          window.aplayers.push(ap);
+        </script>
+</article><!-- lincense--><div class="license-wrapper"><p> <span>Author:  </span><a href="http://JaneBraun.github.io">云亦然</a></p><p> <span>Link:  </span><a href="http://JaneBraun.github.io/2019/02/13/网络安全之Nmap和sqlmap/">http://JaneBraun.github.io/2019/02/13/网络安全之Nmap和sqlmap/</a></p><p> <span>Copyright:  </span><span>All articles in this blog are licensed under <a rel="license" href="https://creativecommons.org/licenses/by-nc-nd/3.0">CC BY-NC-SA 3.0</a> unless stating additionally.</span></p></div><div class="post-paginator"><a class="prevSlogan" href="/2019/03/04/Python-itchat之微信好友大曝光/" title="Python-itchat之微信好友大曝光"><span>< PreviousPost</span><br><span class="prevTitle">Python-itchat之微信好友大曝光</span></a><a class="nextSlogan" href="/2019/01/25/网络安全之AWVS和Nessus工具/" title="网络安全之AWVS和Nessus工具"><span>NextPost ></span><br><span class="nextTitle">网络安全之AWVS和Nessus工具</span></a><div class="clear"></div></div><div id="comment"><div id="container"></div><link rel="stylesheet" href="https://jjeejj.github.io/css/gitment.css"><script src="https://jjeejj.github.io/js/gitment.js"></script><script>var gitment = new Gitment({
+  id: '网络安全之Nmap和sqlmap',
+  owner: 'JaneBraun',
+  repo: 'JaneBraun.github.io',
+  oauth: {
+    client_id: '0a088938e28067a01cb2',
+    client_secret: '5ce5adee232943d97b6823758c846e3d0edc3eed',
+  },
+})
+gitment.render('container')</script></div></section></article><footer id="cxo-footer-outer"><div id="cxo-footer-inner"><p class="footer-container"><script src="https://mkblog.cn/blog/demo/motto/js.php"> </script></p><p class="footer-container"><span>Site by </span><a href="http://hexo.io"><span>Hexo</span></a><span> | theme </span><a href="https://github.com/Longlongyu/hexo-theme-Cxo"><span>Cxo</span></a></p><i class="fa fa-user"> </i><span>本站访客数</span><span id="busuanzi_value_site_uv"></span><span> | </span><i class="fa fa-eye"> </i><span>本站访问量</span><span id="busuanzi_value_site_pv"></span></div></footer><!-- catelog--><div class="toc-wrapper" style="top: 70vh;"><div class="toc-catalog"><i class="fa fa-list"> </i><span>CATALOG</span></div></div><!-- top--><i class="fa fa-arrow-up close" id="go-up" aria-hidden="true"></i><script src="/live2d-widget/lib/L2Dwidget.min.js?0c58a1486de42ac6cc1c59c7d98ae887"></script><script>L2Dwidget.init({"pluginRootPath":"live2d-widget/","pluginJsPath":"lib/","pluginModelPath":"assets/","tagMode":false,"debug":false,"model":{"jsonPath":"/live2d-widget/assets/assets/haruto.model.json"},"display":{"position":"right","width":150,"height":300},"mobile":{"show":true,"scale":0.5},"react":{"opacityDefault":0.7,"opacityOnHover":0.2},"log":false});</script></body></html>

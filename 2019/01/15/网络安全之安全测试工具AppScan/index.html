@@ -1,0 +1,139 @@
+<!DOCTYPE html><html><head><meta name="generator" content="Hexo 3.8.0"><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no"><meta name="author" content="云亦然"><meta name="renderer" content="webkit"><meta name="baidu-site-verification" content="Gp9ShUqSBW"><meta name="google-site-verification" content="vnHxw9xKnwp2dRWqAPmI-QTMJvCDfbXRuoMzb2RbHZw"><meta name="copyright" content="云亦然"><meta name="keywords" content="Hexo"><meta name="description" content="null"><meta name="Cache-Control" content="no-cache"><meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"><title>网络安全之安全测试工具AppScan · 云亦然's Blog</title><link rel="stylesheet" href="/css/style.css?v=2018.7.9"><link rel="stylesheet" href="/css/animation.css?v=2018.7.9"><link rel="icon" href="/source/img/assets/favicon.ico"><link rel="stylesheet" href="https://cdn.bootcss.com/font-awesome/4.7.0/css/font-awesome.min.css?version=1.5.6"><!-- scripts--><script>(function( w ){
+  "use strict";
+  // rel=preload support test
+  if( !w.loadCSS ){
+    w.loadCSS = function(){};
+  }
+  // define on the loadCSS obj
+  var rp = loadCSS.relpreload = {};
+  // rel=preload feature support test
+  // runs once and returns a function for compat purposes
+  rp.support = (function(){
+    var ret;
+    try {
+      ret = w.document.createElement( "link" ).relList.supports( "preload" );
+    } catch (e) {
+      ret = false;
+    }
+    return function(){
+      return ret;
+    };
+  })();
+
+  // if preload isn't supported, get an asynchronous load by using a non-matching media attribute
+  // then change that media back to its intended value on load
+  rp.bindMediaToggle = function( link ){
+    // remember existing media attr for ultimate state, or default to 'all'
+    var finalMedia = link.media || "all";
+
+    function enableStylesheet(){
+      link.media = finalMedia;
+    }
+
+    // bind load handlers to enable media
+    if( link.addEventListener ){
+      link.addEventListener( "load", enableStylesheet );
+    } else if( link.attachEvent ){
+      link.attachEvent( "onload", enableStylesheet );
+    }
+
+    // Set rel and non-applicable media type to start an async request
+    // note: timeout allows this to happen async to let rendering continue in IE
+    setTimeout(function(){
+      link.rel = "stylesheet";
+      link.media = "only x";
+    });
+    // also enable media after 3 seconds,
+    // which will catch very old browsers (android 2.x, old firefox) that don't support onload on link
+    setTimeout( enableStylesheet, 3000 );
+  };
+
+  // loop through link elements in DOM
+  rp.poly = function(){
+    // double check this to prevent external calls from running
+    if( rp.support() ){
+      return;
+    }
+    var links = w.document.getElementsByTagName( "link" );
+    for( var i = 0; i < links.length; i++ ){
+      var link = links[ i ];
+      // qualify links to those with rel=preload and as=style attrs
+      if( link.rel === "preload" && link.getAttribute( "as" ) === "style" && !link.getAttribute( "data-loadcss" ) ){
+        // prevent rerunning on link
+        link.setAttribute( "data-loadcss", true );
+        // bind listeners to toggle media back
+        rp.bindMediaToggle( link );
+      }
+    }
+  };
+
+  // if unsupported, run the polyfill
+  if( !rp.support() ){
+    // run once at least
+    rp.poly();
+
+    // rerun poly on an interval until onload
+    var run = w.setInterval( rp.poly, 500 );
+    if( w.addEventListener ){
+      w.addEventListener( "load", function(){
+        rp.poly();
+        w.clearInterval( run );
+      } );
+    } else if( w.attachEvent ){
+      w.attachEvent( "onload", function(){
+        rp.poly();
+        w.clearInterval( run );
+      } );
+    }
+  }
+
+
+  // commonjs
+  if( typeof exports !== "undefined" ){
+    exports.loadCSS = loadCSS;
+  }
+  else {
+    w.loadCSS = loadCSS;
+  }
+}( typeof global !== "undefined" ? global : this ) );</script><script src="https://cdn.jsdelivr.net/npm/jquery@3.3.1/dist/jquery.min.js" defer></script><script src="/js/main.js?v=2018.7.9" defer></script><!-- fancybox--><link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.2.5/jquery.fancybox.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'"><script src="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.2.5/jquery.fancybox.min.js" defer></script><!-- busuanzi--><script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script><link rel="stylesheet" href="\assets\css\APlayer.min.css" class="aplayer-style-marker">
+<script src="\assets\js\APlayer.min.js" class="aplayer-script-marker"></script>
+</head><body><section class="profile-close" id="cxo-profile"><div class="profile-avatar"><i class="fa fa-caret-left"></i><img src="https://i.loli.net/2019/03/07/5c809e0647313.jpg"></div><!--.profile-saying
+  i.fa.fa-comment
+  .saying--><div class="cxo-profile-inner"><div class="profile-name">云亦然</div><div class="profile-signature">天下皆白，唯我独黑。非攻墨门，兼爱平生。</div><div class="friends"><div>FRIENDS</div><span><a href="//www.hxsgyl.top" target="_black">忘年</a></span><span><a href="//bbs.88hack.com/" target="_black">极安中国</a></span><span><a href="//www.soul666.com/" target="_black">Soul博客</a></span></div><div class="read-progress"></div></div></section><header id="cxo-intro" style="height: 70vh;background-image: url(https://api.r10086.com/动漫综合2.php);"><nav id="cxo-intro-nav"><section><div class="intro-nav-title"><a href="/">云亦然's Blog</a></div><div class="intro-nav-label-box"><a href="/">Home</a><a href="/about/">About</a><a href="/archives/">Archives</a><a href="/tags/">Tags</a></div><i class="fa fa-bars intro-nav-menu"><div class="intro-nav-drop"><a href="/">Home</a><a href="/about/">About</a><a href="/archives/">Archives</a><a href="/tags/">Tags</a></div></i><div class="clear"></div></section></nav><h1 class="post-title">网络安全之安全测试工具AppScan</h1><div class="post-intros"><div class="post-intro-meta"><span class="post-intro-time"><i class="post-intro-calendar fa fa-calendar"></i><span>2019-01-15 10:53:01</span></span><span class="post-intro-tags"><a class="intro-tag fa fa-tag" href="javascript:void(0)" date-tags="网络安全"> 网络安全</a></span></div><div class="post-intro-read"><span> Word count: <span class="post-count">540</span> | Reading time: <span class="post-count">2</span>min</span></div></div></header><article class="cxo-up" id="cxo-content-outer"><section id="cxo-content-inner"><article class="article-entry" id="post"><p><img src="https://i.loli.net/2019/03/07/5c80a4092bb62.png" alt="appscan.png"><br>AppScan是IBM公司出的一款Web应用安全测试工具，<br>AppScan采用黑盒测试的方式，<br>可以扫描常见的web应用安全漏洞。</p>
+<p>工作原理<br>首先是根据起始页爬取站下所有可见的页面，同时测试常见的管理后台；<br>获得所有页面之后利用SQL注入原理进行测试是否存在注入点以及跨站脚本攻击的功能；<br>同时还会对cookie管理、会话周期等常见的web安全漏洞进行检测。AppScan功能十分齐全，支持登录功能并且拥有十分强大的报表。在扫描结果中，不仅能够看到扫描的漏洞，还提供了详尽的漏洞原理、修改建议、手动验证等功能。<br>AppScan的缺点在于，作为一款商业软件，价格十分昂贵。</p>
+<p>适用对象<br>适用于任何企业的内网、外网和面向客户、厂商和其它人员的Web网站</p>
+<p>法律规定<br>中华人民共和国刑法<br>第二百八十五条<br>第二百八十六条<br>第二百八十七条</p>
+<p>AppScan的安装<br>AppScan作为一款集成的工具跟其他常见工具安装一样，基本就是直接下一步即可。<br>安装前需要依赖.net framework 4.5<br>AppScan约800M</p>
+<p>AppScan扫描实例演示<br>使用配置向导<br>通过配置向导来完成一次简单的扫描<br>扫描的网站：<a href="http://testasp.vulnweb.com/" target="_blank" rel="noopener">http://testasp.vulnweb.com/</a><br>PS：请勿随意扫描互联网上的中小企业网站！<br><img src="https://i.loli.net/2019/03/07/5c80a40b268bf.png" alt="appscan1.png"></p>
+<p>配置向导的缺点<br>简单的配置，可能无法找到所有的网页。<br>例如：类似业务逻辑，转账之类的功能点。<br>转账成功的页面扫描器是无法到达的。<br>或者AppScan自带的浏览器无法打开某些网页。</p>
+<p>其他功能<br>1.web service扫描<br>2.玻璃盒扫描技术<br>3.记录代理功能</p>
+
+        <div id="aplayer-eYduIDDq" class="aplayer aplayer-tag-marker" style="margin-bottom: 20px;">
+            <pre class="aplayer-lrc-content"></pre>
+        </div>
+        <script>
+          var ap = new APlayer({
+            element: document.getElementById("aplayer-eYduIDDq"),
+            narrow: false,
+            autoplay: true,
+            showlrc: false,
+            music: {
+              title: "故乡",
+              author: "许巍",
+              url: "http://other.web.ra01.sycdn.kuwo.cn/resource/n2/128/8/90/3648166111.mp3",
+              pic: "http://img2.kuwo.cn/star/starheads/120/4/91a20111de4e533dfbde61da6050e02_0.jpg",
+              lrc: ""
+            }
+          });
+          window.aplayers || (window.aplayers = []);
+          window.aplayers.push(ap);
+        </script></article><!-- lincense--><div class="license-wrapper"><p> <span>Author:  </span><a href="http://JaneBraun.github.io">云亦然</a></p><p> <span>Link:  </span><a href="http://JaneBraun.github.io/2019/01/15/网络安全之安全测试工具AppScan/">http://JaneBraun.github.io/2019/01/15/网络安全之安全测试工具AppScan/</a></p><p> <span>Copyright:  </span><span>All articles in this blog are licensed under <a rel="license" href="https://creativecommons.org/licenses/by-nc-nd/3.0">CC BY-NC-SA 3.0</a> unless stating additionally.</span></p></div><div class="post-paginator"><a class="prevSlogan" href="/2019/01/25/网络安全之AWVS和Nessus工具/" title="网络安全之AWVS和Nessus工具"><span>< PreviousPost</span><br><span class="prevTitle">网络安全之AWVS和Nessus工具</span></a><a class="nextSlogan" href="/2019/01/07/网络安全之漏洞信息收集/" title="网络安全之漏洞信息收集"><span>NextPost ></span><br><span class="nextTitle">网络安全之漏洞信息收集</span></a><div class="clear"></div></div><div id="comment"><div id="container"></div><link rel="stylesheet" href="https://jjeejj.github.io/css/gitment.css"><script src="https://jjeejj.github.io/js/gitment.js"></script><script>var gitment = new Gitment({
+  id: '网络安全之安全测试工具AppScan',
+  owner: 'JaneBraun',
+  repo: 'JaneBraun.github.io',
+  oauth: {
+    client_id: '0a088938e28067a01cb2',
+    client_secret: '5ce5adee232943d97b6823758c846e3d0edc3eed',
+  },
+})
+gitment.render('container')</script></div></section></article><footer id="cxo-footer-outer"><div id="cxo-footer-inner"><p class="footer-container"><script src="https://mkblog.cn/blog/demo/motto/js.php"> </script></p><p class="footer-container"><span>Site by </span><a href="http://hexo.io"><span>Hexo</span></a><span> | theme </span><a href="https://github.com/Longlongyu/hexo-theme-Cxo"><span>Cxo</span></a></p><i class="fa fa-user"> </i><span>本站访客数</span><span id="busuanzi_value_site_uv"></span><span> | </span><i class="fa fa-eye"> </i><span>本站访问量</span><span id="busuanzi_value_site_pv"></span></div></footer><!-- catelog--><div class="toc-wrapper" style="top: 70vh;"><div class="toc-catalog"><i class="fa fa-list"> </i><span>CATALOG</span></div></div><!-- top--><i class="fa fa-arrow-up close" id="go-up" aria-hidden="true"></i><script src="/live2d-widget/lib/L2Dwidget.min.js?0c58a1486de42ac6cc1c59c7d98ae887"></script><script>L2Dwidget.init({"pluginRootPath":"live2d-widget/","pluginJsPath":"lib/","pluginModelPath":"assets/","tagMode":false,"debug":false,"model":{"jsonPath":"/live2d-widget/assets/assets/haruto.model.json"},"display":{"position":"right","width":150,"height":300},"mobile":{"show":true,"scale":0.5},"react":{"opacityDefault":0.7,"opacityOnHover":0.2},"log":false});</script></body></html>

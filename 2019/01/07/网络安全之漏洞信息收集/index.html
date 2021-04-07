@@ -1,0 +1,151 @@
+<!DOCTYPE html><html><head><meta name="generator" content="Hexo 3.8.0"><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no"><meta name="author" content="云亦然"><meta name="renderer" content="webkit"><meta name="baidu-site-verification" content="Gp9ShUqSBW"><meta name="google-site-verification" content="vnHxw9xKnwp2dRWqAPmI-QTMJvCDfbXRuoMzb2RbHZw"><meta name="copyright" content="云亦然"><meta name="keywords" content="Hexo"><meta name="description" content="null"><meta name="Cache-Control" content="no-cache"><meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"><title>网络安全之漏洞信息收集 · 云亦然's Blog</title><link rel="stylesheet" href="/css/style.css?v=2018.7.9"><link rel="stylesheet" href="/css/animation.css?v=2018.7.9"><link rel="icon" href="/source/img/assets/favicon.ico"><link rel="stylesheet" href="https://cdn.bootcss.com/font-awesome/4.7.0/css/font-awesome.min.css?version=1.5.6"><!-- scripts--><script>(function( w ){
+  "use strict";
+  // rel=preload support test
+  if( !w.loadCSS ){
+    w.loadCSS = function(){};
+  }
+  // define on the loadCSS obj
+  var rp = loadCSS.relpreload = {};
+  // rel=preload feature support test
+  // runs once and returns a function for compat purposes
+  rp.support = (function(){
+    var ret;
+    try {
+      ret = w.document.createElement( "link" ).relList.supports( "preload" );
+    } catch (e) {
+      ret = false;
+    }
+    return function(){
+      return ret;
+    };
+  })();
+
+  // if preload isn't supported, get an asynchronous load by using a non-matching media attribute
+  // then change that media back to its intended value on load
+  rp.bindMediaToggle = function( link ){
+    // remember existing media attr for ultimate state, or default to 'all'
+    var finalMedia = link.media || "all";
+
+    function enableStylesheet(){
+      link.media = finalMedia;
+    }
+
+    // bind load handlers to enable media
+    if( link.addEventListener ){
+      link.addEventListener( "load", enableStylesheet );
+    } else if( link.attachEvent ){
+      link.attachEvent( "onload", enableStylesheet );
+    }
+
+    // Set rel and non-applicable media type to start an async request
+    // note: timeout allows this to happen async to let rendering continue in IE
+    setTimeout(function(){
+      link.rel = "stylesheet";
+      link.media = "only x";
+    });
+    // also enable media after 3 seconds,
+    // which will catch very old browsers (android 2.x, old firefox) that don't support onload on link
+    setTimeout( enableStylesheet, 3000 );
+  };
+
+  // loop through link elements in DOM
+  rp.poly = function(){
+    // double check this to prevent external calls from running
+    if( rp.support() ){
+      return;
+    }
+    var links = w.document.getElementsByTagName( "link" );
+    for( var i = 0; i < links.length; i++ ){
+      var link = links[ i ];
+      // qualify links to those with rel=preload and as=style attrs
+      if( link.rel === "preload" && link.getAttribute( "as" ) === "style" && !link.getAttribute( "data-loadcss" ) ){
+        // prevent rerunning on link
+        link.setAttribute( "data-loadcss", true );
+        // bind listeners to toggle media back
+        rp.bindMediaToggle( link );
+      }
+    }
+  };
+
+  // if unsupported, run the polyfill
+  if( !rp.support() ){
+    // run once at least
+    rp.poly();
+
+    // rerun poly on an interval until onload
+    var run = w.setInterval( rp.poly, 500 );
+    if( w.addEventListener ){
+      w.addEventListener( "load", function(){
+        rp.poly();
+        w.clearInterval( run );
+      } );
+    } else if( w.attachEvent ){
+      w.attachEvent( "onload", function(){
+        rp.poly();
+        w.clearInterval( run );
+      } );
+    }
+  }
+
+
+  // commonjs
+  if( typeof exports !== "undefined" ){
+    exports.loadCSS = loadCSS;
+  }
+  else {
+    w.loadCSS = loadCSS;
+  }
+}( typeof global !== "undefined" ? global : this ) );</script><script src="https://cdn.jsdelivr.net/npm/jquery@3.3.1/dist/jquery.min.js" defer></script><script src="/js/main.js?v=2018.7.9" defer></script><!-- fancybox--><link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.2.5/jquery.fancybox.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'"><script src="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.2.5/jquery.fancybox.min.js" defer></script><!-- busuanzi--><script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script><link rel="stylesheet" href="\assets\css\APlayer.min.css" class="aplayer-style-marker">
+<script src="\assets\js\APlayer.min.js" class="aplayer-script-marker"></script>
+</head><body><section class="profile-close" id="cxo-profile"><div class="profile-avatar"><i class="fa fa-caret-left"></i><img src="https://i.loli.net/2019/03/07/5c809e0647313.jpg"></div><!--.profile-saying
+  i.fa.fa-comment
+  .saying--><div class="cxo-profile-inner"><div class="profile-name">云亦然</div><div class="profile-signature">天下皆白，唯我独黑。非攻墨门，兼爱平生。</div><div class="friends"><div>FRIENDS</div><span><a href="//www.hxsgyl.top" target="_black">忘年</a></span><span><a href="//bbs.88hack.com/" target="_black">极安中国</a></span><span><a href="//www.soul666.com/" target="_black">Soul博客</a></span></div><div class="read-progress"></div></div></section><header id="cxo-intro" style="height: 70vh;background-image: url(https://api.r10086.com/动漫综合2.php);"><nav id="cxo-intro-nav"><section><div class="intro-nav-title"><a href="/">云亦然's Blog</a></div><div class="intro-nav-label-box"><a href="/">Home</a><a href="/about/">About</a><a href="/archives/">Archives</a><a href="/tags/">Tags</a></div><i class="fa fa-bars intro-nav-menu"><div class="intro-nav-drop"><a href="/">Home</a><a href="/about/">About</a><a href="/archives/">Archives</a><a href="/tags/">Tags</a></div></i><div class="clear"></div></section></nav><h1 class="post-title">网络安全之漏洞信息收集</h1><div class="post-intros"><div class="post-intro-meta"><span class="post-intro-time"><i class="post-intro-calendar fa fa-calendar"></i><span>2019-01-07 16:07:52</span></span><span class="post-intro-tags"><a class="intro-tag fa fa-tag" href="javascript:void(0)" date-tags="网络安全"> 网络安全</a></span></div><div class="post-intro-read"><span> Word count: <span class="post-count">1k</span> | Reading time: <span class="post-count">3</span>min</span></div></div></header><article class="cxo-up" id="cxo-content-outer"><section id="cxo-content-inner"><article class="article-entry" id="post"><p>漏洞信息收集</p>
+<p>漏洞平台是很好的信息收集平台，能够通过公开的漏洞报告了解目标的各项信息，常用的漏洞平台如下：<br>乌云漏洞平台<br><img src="https://i.loli.net/2019/03/07/5c80a2a17a1b1.png" alt="wuyun.png"><br>360补天漏洞平台<br>Exploit-DB<br>GHDB<br>CVE中文漏洞信息库<br>中国国家信息安全漏洞库<br>国家信息安全漏洞共享平台</p>
+<p>漏洞库搜索方式：<br>1.搜索对应厂商<br>2.搜索对应软件平台</p>
+<p>信息收集的目标：<br>1.已有的渗透过程<br>2.目标的技术架构<br>3.目标使用架构的公开漏洞<br>4.目标可能进行的修复</p>
+<p>使用搜索引擎搜索漏洞：<br>上传类<br>注入类<br>敏感信息类<br>例如：可通过搜索引擎寻找目标使用的CMS平台漏洞，再对目标站点进行测试。</p>
+<p>使用工具收集信息<br>Windows平台下常用的几种工具和方法：<br>1.使用DOS命令<br>2.使用各类扫描工具<br>3.使用浏览器内置功能和插件</p>
+<p>常用的DOS命令：<br>ping ： 网络连通测试<br>arp ： 显示和修改地址解析协议<br>tracert ： 显示路由<br><img src="https://i.loli.net/2019/03/07/5c80a2a182bc6.png" alt="tracert.png"><br>nslookup ：域名系统查询</p>
+<p>telnet ： 测试是否开启远程连接<br>netstat ： 查看本地机器所有开放端口<br>nbtstat ： 获取NetBIOS信息<br>ftp ： 测试开放了ftp的远程主机<br>net ： 最重要的命令，需要透彻掌握每一个自=子命令</p>
+<p>常用的扫描工具：<br>AWVS<br>AppScan<br><img src="https://i.loli.net/2019/03/07/5c80a242da4cd.png" alt=""></p>
+<p>Zenmap<br>Dirbuster<br>Wwwscan<br>御剑系列扫描工具<br>Layer子域名挖掘机<br>Maltego</p>
+<p>可以用作信息收集的工具很多，在此仅列举几个例子</p>
+<p>使用浏览器内置功能和插件：<br>  常用浏览器有Google Chrome、Firefox、IE、傲游浏览器<br>以火狐浏览器为例，有几种实用的插件如下：<br>showIP插件<br><img src="https://i.loli.net/2019/03/07/5c80a2a1be62e.png" alt="showip.png"><br>HttpFox插件<br>Cookie Watcher插件<br>Header Spy插件<br>Wappalyzer插件<br>FlagFox插件<br>DomainDetails插件<br>内置功能：<br>  使用浏览器内置的开发者工具收集页面信息F12</p>
+<p>Kali Linux<br>1.枚举服务<br>DNS枚举工具DNSenum<br><img src="https://i.loli.net/2019/03/07/5c80a2a1c9282.png" alt="dnsenum.png"><br>DNS枚举工具fierce<br>SNMP枚举工具Snmpwalk<br>2.测试网络范围<br>域名查询工具Dmitry<br><img src="https://i.loli.net/2019/03/07/5c80a271148e7.png" alt="dmitry.png"><br>跟踪路由工具Scapy<br>3.识别活跃的主机、查看打开的端口、系统指纹识别、服务的指纹识别<br>Namp<br>hping3<br>4.其他信息收集手段<br> ARP侦查工具Netdiscover<br>5.使用Maltego收集信息<br><img src="https://i.loli.net/2019/03/07/5c80a2a230c21.png" alt="maltego.png"></p>
+<p>在社交网站中进行数据挖掘<br>社交网站特点：<br>清晰暴露个人关系网络<br>包含大量个人信息<br>具备多种工作、生活服务功能<br>身份认证机制并非完美<br>记录大量个人行为特征</p>
+<p>信息获取：<br>直接通过个人资料和发布的信息<br>获取姓名、出生日期、电话号码、<br>QQ号码、微信号码、电子邮箱、<br>网络昵称、籍贯信息、学校信息、<br>工作单位、车牌号码、宠物昵称<br>等一切能够直观获得的数据。</p>
+<p>分析关系网络：<br>  分析目标稳定的社交圈子人物分布，<br>包括相互关系、工作职能、年龄性别、<br>地理分布、共同兴趣等信息。</p>
+<p>深度分析：<br>语言文字图片中判定性格特征<br>综合关联分析兴趣爱好<br>分析目标需求<br>分析目标当前主要矛盾<br>分析目标特长和弱点<br>提取重要日期、文字、数字等</p>
+<p>获取信息后能干什么：<br>钓鱼攻击<br>完善密码构成元素<br>通过目标员工套取企业信息<br>查询已有数据库中的密码<br>判定目标可能会使用的安全技术</p>
+<p>一切的前提：身份伪造<br>使用伪造的帐号密码、身份信息长期在各主流网站“养”一些伪装帐号<br>帐号的信息，例如照片、博文等，可从他人真实帐号中获取，并时常维护所<br>“养”帐号尽可能涵盖更多的身份、年龄分布、职业分布</p>
+
+        <div id="aplayer-xIGExLeE" class="aplayer aplayer-tag-marker" style="margin-bottom: 20px;">
+            <pre class="aplayer-lrc-content"></pre>
+        </div>
+        <script>
+          var ap = new APlayer({
+            element: document.getElementById("aplayer-xIGExLeE"),
+            narrow: false,
+            autoplay: true,
+            showlrc: false,
+            music: {
+              title: "故乡",
+              author: "许巍",
+              url: "http://other.web.ra01.sycdn.kuwo.cn/resource/n2/128/8/90/3648166111.mp3",
+              pic: "http://img2.kuwo.cn/star/starheads/120/4/91a20111de4e533dfbde61da6050e02_0.jpg",
+              lrc: ""
+            }
+          });
+          window.aplayers || (window.aplayers = []);
+          window.aplayers.push(ap);
+        </script>
+</article><!-- lincense--><div class="license-wrapper"><p> <span>Author:  </span><a href="http://JaneBraun.github.io">云亦然</a></p><p> <span>Link:  </span><a href="http://JaneBraun.github.io/2019/01/07/网络安全之漏洞信息收集/">http://JaneBraun.github.io/2019/01/07/网络安全之漏洞信息收集/</a></p><p> <span>Copyright:  </span><span>All articles in this blog are licensed under <a rel="license" href="https://creativecommons.org/licenses/by-nc-nd/3.0">CC BY-NC-SA 3.0</a> unless stating additionally.</span></p></div><div class="post-paginator"><a class="prevSlogan" href="/2019/01/15/网络安全之安全测试工具AppScan/" title="网络安全之安全测试工具AppScan"><span>< PreviousPost</span><br><span class="prevTitle">网络安全之安全测试工具AppScan</span></a><a class="nextSlogan" href="/2018/12/28/网络安全之搜索引擎收集信息/" title="网络安全之搜索引擎收集信息"><span>NextPost ></span><br><span class="nextTitle">网络安全之搜索引擎收集信息</span></a><div class="clear"></div></div><div id="comment"><div id="container"></div><link rel="stylesheet" href="https://jjeejj.github.io/css/gitment.css"><script src="https://jjeejj.github.io/js/gitment.js"></script><script>var gitment = new Gitment({
+  id: '网络安全之漏洞信息收集',
+  owner: 'JaneBraun',
+  repo: 'JaneBraun.github.io',
+  oauth: {
+    client_id: '0a088938e28067a01cb2',
+    client_secret: '5ce5adee232943d97b6823758c846e3d0edc3eed',
+  },
+})
+gitment.render('container')</script></div></section></article><footer id="cxo-footer-outer"><div id="cxo-footer-inner"><p class="footer-container"><script src="https://mkblog.cn/blog/demo/motto/js.php"> </script></p><p class="footer-container"><span>Site by </span><a href="http://hexo.io"><span>Hexo</span></a><span> | theme </span><a href="https://github.com/Longlongyu/hexo-theme-Cxo"><span>Cxo</span></a></p><i class="fa fa-user"> </i><span>本站访客数</span><span id="busuanzi_value_site_uv"></span><span> | </span><i class="fa fa-eye"> </i><span>本站访问量</span><span id="busuanzi_value_site_pv"></span></div></footer><!-- catelog--><div class="toc-wrapper" style="top: 70vh;"><div class="toc-catalog"><i class="fa fa-list"> </i><span>CATALOG</span></div></div><!-- top--><i class="fa fa-arrow-up close" id="go-up" aria-hidden="true"></i><script src="/live2d-widget/lib/L2Dwidget.min.js?0c58a1486de42ac6cc1c59c7d98ae887"></script><script>L2Dwidget.init({"pluginRootPath":"live2d-widget/","pluginJsPath":"lib/","pluginModelPath":"assets/","tagMode":false,"debug":false,"model":{"jsonPath":"/live2d-widget/assets/assets/haruto.model.json"},"display":{"position":"right","width":150,"height":300},"mobile":{"show":true,"scale":0.5},"react":{"opacityDefault":0.7,"opacityOnHover":0.2},"log":false});</script></body></html>

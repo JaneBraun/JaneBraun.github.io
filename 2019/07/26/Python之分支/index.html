@@ -1,0 +1,140 @@
+<!DOCTYPE html><html><head><meta name="generator" content="Hexo 3.8.0"><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no"><meta name="author" content="云亦然"><meta name="renderer" content="webkit"><meta name="baidu-site-verification" content="Gp9ShUqSBW"><meta name="google-site-verification" content="vnHxw9xKnwp2dRWqAPmI-QTMJvCDfbXRuoMzb2RbHZw"><meta name="copyright" content="云亦然"><meta name="keywords" content="Hexo"><meta name="description" content="null"><meta name="Cache-Control" content="no-cache"><meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"><title>Python之分支 · 云亦然's Blog</title><link rel="stylesheet" href="/css/style.css?v=2018.7.9"><link rel="stylesheet" href="/css/animation.css?v=2018.7.9"><link rel="icon" href="/source/img/assets/favicon.ico"><link rel="stylesheet" href="https://cdn.bootcss.com/font-awesome/4.7.0/css/font-awesome.min.css?version=1.5.6"><!-- scripts--><script>(function( w ){
+  "use strict";
+  // rel=preload support test
+  if( !w.loadCSS ){
+    w.loadCSS = function(){};
+  }
+  // define on the loadCSS obj
+  var rp = loadCSS.relpreload = {};
+  // rel=preload feature support test
+  // runs once and returns a function for compat purposes
+  rp.support = (function(){
+    var ret;
+    try {
+      ret = w.document.createElement( "link" ).relList.supports( "preload" );
+    } catch (e) {
+      ret = false;
+    }
+    return function(){
+      return ret;
+    };
+  })();
+
+  // if preload isn't supported, get an asynchronous load by using a non-matching media attribute
+  // then change that media back to its intended value on load
+  rp.bindMediaToggle = function( link ){
+    // remember existing media attr for ultimate state, or default to 'all'
+    var finalMedia = link.media || "all";
+
+    function enableStylesheet(){
+      link.media = finalMedia;
+    }
+
+    // bind load handlers to enable media
+    if( link.addEventListener ){
+      link.addEventListener( "load", enableStylesheet );
+    } else if( link.attachEvent ){
+      link.attachEvent( "onload", enableStylesheet );
+    }
+
+    // Set rel and non-applicable media type to start an async request
+    // note: timeout allows this to happen async to let rendering continue in IE
+    setTimeout(function(){
+      link.rel = "stylesheet";
+      link.media = "only x";
+    });
+    // also enable media after 3 seconds,
+    // which will catch very old browsers (android 2.x, old firefox) that don't support onload on link
+    setTimeout( enableStylesheet, 3000 );
+  };
+
+  // loop through link elements in DOM
+  rp.poly = function(){
+    // double check this to prevent external calls from running
+    if( rp.support() ){
+      return;
+    }
+    var links = w.document.getElementsByTagName( "link" );
+    for( var i = 0; i < links.length; i++ ){
+      var link = links[ i ];
+      // qualify links to those with rel=preload and as=style attrs
+      if( link.rel === "preload" && link.getAttribute( "as" ) === "style" && !link.getAttribute( "data-loadcss" ) ){
+        // prevent rerunning on link
+        link.setAttribute( "data-loadcss", true );
+        // bind listeners to toggle media back
+        rp.bindMediaToggle( link );
+      }
+    }
+  };
+
+  // if unsupported, run the polyfill
+  if( !rp.support() ){
+    // run once at least
+    rp.poly();
+
+    // rerun poly on an interval until onload
+    var run = w.setInterval( rp.poly, 500 );
+    if( w.addEventListener ){
+      w.addEventListener( "load", function(){
+        rp.poly();
+        w.clearInterval( run );
+      } );
+    } else if( w.attachEvent ){
+      w.attachEvent( "onload", function(){
+        rp.poly();
+        w.clearInterval( run );
+      } );
+    }
+  }
+
+
+  // commonjs
+  if( typeof exports !== "undefined" ){
+    exports.loadCSS = loadCSS;
+  }
+  else {
+    w.loadCSS = loadCSS;
+  }
+}( typeof global !== "undefined" ? global : this ) );</script><script src="https://cdn.jsdelivr.net/npm/jquery@3.3.1/dist/jquery.min.js" defer></script><script src="/js/main.js?v=2018.7.9" defer></script><!-- fancybox--><link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.2.5/jquery.fancybox.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'"><script src="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.2.5/jquery.fancybox.min.js" defer></script><!-- busuanzi--><script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script><link rel="stylesheet" href="\assets\css\APlayer.min.css" class="aplayer-style-marker">
+<script src="\assets\js\APlayer.min.js" class="aplayer-script-marker"></script>
+</head><body><section class="profile-close" id="cxo-profile"><div class="profile-avatar"><i class="fa fa-caret-left"></i><img src="https://i.loli.net/2019/03/07/5c809e0647313.jpg"></div><!--.profile-saying
+  i.fa.fa-comment
+  .saying--><div class="cxo-profile-inner"><div class="profile-name">云亦然</div><div class="profile-signature">天下皆白，唯我独黑。非攻墨门，兼爱平生。</div><div class="friends"><div>FRIENDS</div><span><a href="//www.hxsgyl.top" target="_black">忘年</a></span><span><a href="//bbs.88hack.com/" target="_black">极安中国</a></span><span><a href="//www.soul666.com/" target="_black">Soul博客</a></span></div><div class="read-progress"></div></div></section><header id="cxo-intro" style="height: 70vh;background-image: url(https://api.r10086.com/动漫综合2.php);"><nav id="cxo-intro-nav"><section><div class="intro-nav-title"><a href="/">云亦然's Blog</a></div><div class="intro-nav-label-box"><a href="/">Home</a><a href="/about/">About</a><a href="/archives/">Archives</a><a href="/tags/">Tags</a></div><i class="fa fa-bars intro-nav-menu"><div class="intro-nav-drop"><a href="/">Home</a><a href="/about/">About</a><a href="/archives/">Archives</a><a href="/tags/">Tags</a></div></i><div class="clear"></div></section></nav><h1 class="post-title">Python之分支</h1><div class="post-intros"><div class="post-intro-meta"><span class="post-intro-time"><i class="post-intro-calendar fa fa-calendar"></i><span>2019-07-26 15:49:28</span></span><span class="post-intro-tags"><a class="intro-tag fa fa-tag" href="javascript:void(0)" date-tags="python学习笔记"> python学习笔记</a></span></div><div class="post-intro-read"><span> Word count: <span class="post-count">1.1k</span> | Reading time: <span class="post-count">4</span>min</span></div></div></header><article class="cxo-up" id="cxo-content-outer"><section id="cxo-content-inner"><article class="article-entry" id="post"><h1 id="python学习笔记之分支"><a href="#python学习笔记之分支" class="headerlink" title="python学习笔记之分支"></a>python学习笔记之分支</h1><figure class="highlight routeros"><figcaption><span>[Python基础之判断年龄]</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 1. 定义一个整数变量记录年龄</span></span><br><span class="line">age = 15</span><br><span class="line"></span><br><span class="line"><span class="comment"># 2. 判断是否满了18岁</span></span><br><span class="line"><span class="keyword">if</span> age &gt;= 18:</span><br><span class="line">    # 3. 如果满了18岁，可以进网吧嗨皮</span><br><span class="line">    <span class="builtin-name">print</span>(<span class="string">"你已经成年，欢迎进网吧嗨皮"</span>)</span><br><span class="line"></span><br><span class="line">    <span class="builtin-name">print</span>(<span class="string">"欢迎欢迎，热烈欢迎"</span>)</span><br><span class="line"></span><br><span class="line"><span class="builtin-name">print</span>(<span class="string">"看看什么时候会执行"</span>)</span><br></pre></td></tr></table></figure>
+<figure class="highlight hsp"><figcaption><span>[Python基础之判断年龄改进版]</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="meta"># 输入用户年龄</span></span><br><span class="line">age = <span class="keyword">int</span>(<span class="keyword">input</span>(<span class="string">"请输入您的年龄："</span>))</span><br><span class="line"></span><br><span class="line"><span class="meta"># 判断是否满 <span class="number">18</span> 岁 (&gt;=)</span></span><br><span class="line"><span class="keyword">if</span> age &gt;= <span class="number">18</span>:</span><br><span class="line"></span><br><span class="line">    <span class="meta"># 如果满 <span class="number">18</span> 岁，允许进网吧嗨皮</span></span><br><span class="line">    <span class="keyword">print</span>(<span class="string">"你已经成年，欢迎来网吧嗨皮"</span>)</span><br><span class="line"></span><br><span class="line"><span class="keyword">else</span>:</span><br><span class="line">    <span class="meta"># 如果未满 <span class="number">18</span> 岁，提示回家写作业</span></span><br><span class="line">    <span class="keyword">print</span>(<span class="string">"你还没有成年，请回家写作业吧"</span>)</span><br><span class="line"></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<figure class="highlight python"><figcaption><span>[Python基础之逻辑运算演练]</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 练习1: 定义一个整数变量 age,编写代码判断是否正确</span></span><br><span class="line">age = <span class="number">120</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 要求人的年龄在 0-120 之间</span></span><br><span class="line"><span class="string">"""</span></span><br><span class="line"><span class="string">10000</span></span><br><span class="line"><span class="string">age &gt;= 0 and age &lt;=120</span></span><br><span class="line"><span class="string">and</span></span><br><span class="line"><span class="string">or</span></span><br><span class="line"><span class="string">"""</span></span><br><span class="line"><span class="keyword">if</span> age &gt;= <span class="number">0</span> <span class="keyword">and</span> age &lt;=<span class="number">120</span>:</span><br><span class="line">    print(<span class="string">"年龄正确"</span>)</span><br><span class="line"><span class="keyword">else</span>:</span><br><span class="line">    print(<span class="string">"年龄不正确"</span>)</span><br><span class="line"></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<figure class="highlight routeros"><figcaption><span>[Python基础之判断考试成绩]</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 练习2：定义两个整数变量 python_score、c_score，编写代码判断成绩</span></span><br><span class="line">python_score = 80</span><br><span class="line">c_score = 75</span><br><span class="line"></span><br><span class="line"><span class="comment"># 要求只要有一门成绩 &gt; 60 分就算及格</span></span><br><span class="line"><span class="keyword">if</span> python_score &gt; 60 <span class="keyword">or</span> c_score &gt; 60:</span><br><span class="line">    <span class="builtin-name">print</span>(<span class="string">"考试通过"</span>)</span><br><span class="line"><span class="keyword">else</span>:</span><br><span class="line">    <span class="builtin-name">print</span>(<span class="string">"考试失败，继续努力"</span>)</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<figure class="highlight routeros"><figcaption><span>[Python基础之非公勿入]</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 练习3：定义一个布尔型变量 is_employee,编写代码判断是否是本公司员工</span></span><br><span class="line">is_employee = <span class="literal">False</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 如果不是提示不允许入内</span></span><br><span class="line"><span class="comment"># 在开发中，通常希望某个条件不满足时，执行一些代码，可以使用 not</span></span><br><span class="line"><span class="comment"># 另外，如果需要拼接复杂的逻辑计算条件，同样也有可能用到not</span></span><br><span class="line"><span class="keyword">if</span> <span class="keyword">not</span> is_employee:</span><br><span class="line">    <span class="builtin-name">print</span>(<span class="string">"非本公司人员，请勿入内"</span>)</span><br></pre></td></tr></table></figure>
+<figure class="highlight routeros"><figcaption><span>[Python基础之女友的节日]</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 定义 holiday_name 字符串变量记录节日名称</span></span><br><span class="line">holiday_name = <span class="string">"情人节"</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 如果是 情人节 应该 买玫瑰/看电影</span></span><br><span class="line"><span class="keyword">if</span> holiday_name == <span class="string">"情人节"</span>:</span><br><span class="line">    <span class="builtin-name">print</span>(<span class="string">"买玫瑰"</span>)</span><br><span class="line">    <span class="builtin-name">print</span>(<span class="string">"看电影"</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 如果是 平安夜 应该 买苹果/吃大餐</span></span><br><span class="line">elif holiday_name == <span class="string">"平安节"</span>:</span><br><span class="line">    <span class="builtin-name">print</span>(<span class="string">"买苹果"</span>)</span><br><span class="line">    <span class="builtin-name">print</span>(<span class="string">"吃大餐"</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 如果是 生日 应该 买蛋糕</span></span><br><span class="line">elif holiday_name == <span class="string">"生日"</span>:</span><br><span class="line">    <span class="builtin-name">print</span>(<span class="string">"买蛋糕"</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 其他的日子每天都是节日啊....</span></span><br><span class="line"><span class="keyword">else</span>:</span><br><span class="line">    <span class="builtin-name">print</span>(<span class="string">"每天都是节日啊"</span>)</span><br></pre></td></tr></table></figure>
+<figure class="highlight routeros"><figcaption><span>[Python基础之火车站安检]</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 定义布尔型变量 has_ticket 表示是否有车票</span></span><br><span class="line">has_ticket = <span class="literal">True</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 定义整型变量 knife_length 表示刀的长度，单位：厘米</span></span><br><span class="line">knife_length = 30</span><br><span class="line"></span><br><span class="line"><span class="comment"># 首先检查是否有车票，如果有，才允许进行 安检</span></span><br><span class="line"><span class="keyword">if</span> has_ticket:</span><br><span class="line">    <span class="builtin-name">print</span>(<span class="string">"车票检查通过，准备开始安检"</span>)</span><br><span class="line"></span><br><span class="line">    # 安检时，需要检查刀的长度，判断是否超过 8 厘米</span><br><span class="line">    <span class="keyword">if</span> knife_length &gt; 8 :</span><br><span class="line"></span><br><span class="line">        # 如果超过 8 厘米，提示刀的长度，不允许上车</span><br><span class="line">        <span class="builtin-name">print</span>(<span class="string">"您携带的刀太长了，有 %d 厘米长"</span>% knife_length)</span><br><span class="line">        <span class="builtin-name">print</span>(<span class="string">"不允许上车"</span>)</span><br><span class="line">    # 如果不超过 8 厘米，安检通过</span><br><span class="line">    <span class="keyword">else</span>:</span><br><span class="line">        <span class="builtin-name">print</span>(<span class="string">"安检已经通过，祝你旅途愉快！"</span>)</span><br><span class="line"><span class="comment"># 如果没有车票，不允许进门</span></span><br><span class="line"><span class="keyword">else</span>:</span><br><span class="line">    <span class="builtin-name">print</span>(<span class="string">"请先买票"</span>)</span><br></pre></td></tr></table></figure>
+<figure class="highlight nix"><figcaption><span>[Python基础之石头剪刀布]</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 导入随机工具包</span></span><br><span class="line"><span class="comment"># 注意：在导入工具包的时候，应该将导入的语句，放在文件的顶部</span></span><br><span class="line"><span class="comment"># 因为，这样可以方便下方的代码，在任何需要的时候，使用工具包中的工具</span></span><br><span class="line"><span class="built_in">import</span> random</span><br><span class="line"></span><br><span class="line"><span class="comment"># 从控制台输入要出的拳 —— 石头(1)/剪刀(2)/布(3)</span></span><br><span class="line"><span class="attr">player</span> = int(input(<span class="string">"请输入您要出的拳 石头(1) /剪刀(2) /布(3)"</span>))</span><br><span class="line"></span><br><span class="line"><span class="comment"># 电脑 随机 出拳 —— 先假定电脑只会出石头，完成整体代码功能</span></span><br><span class="line"><span class="attr">computer</span> = random.randint(<span class="number">1</span>,<span class="number">3</span>)</span><br><span class="line"></span><br><span class="line">print(<span class="string">"玩家选择的拳头是 %d - 电脑出的拳是 %d"</span> % (player,computer))</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment"># 比较胜负</span></span><br><span class="line"><span class="comment"># 1 石头 胜 剪刀</span></span><br><span class="line"><span class="comment"># 2 剪刀 胜 布</span></span><br><span class="line"><span class="comment"># 3 布 胜 石头</span></span><br><span class="line"><span class="comment"># if (()</span></span><br><span class="line"><span class="comment">#   or ()</span></span><br><span class="line"><span class="comment">#   or ()):</span></span><br><span class="line"><span class="keyword">if</span> ((<span class="attr">player</span> == <span class="number">1</span> <span class="literal">and</span> <span class="attr">computer</span> == <span class="number">2</span>)</span><br><span class="line">        <span class="literal">or</span> (<span class="attr">player</span> == <span class="number">2</span> <span class="literal">and</span> <span class="attr">computer</span> == <span class="number">3</span>)</span><br><span class="line">        <span class="literal">or</span> (<span class="attr">player</span> == <span class="number">3</span> <span class="literal">and</span> <span class="attr">computer</span> == <span class="number">1</span>)):</span><br><span class="line"></span><br><span class="line">    print(<span class="string">"欧耶，电脑弱爆了！"</span>)</span><br><span class="line"><span class="comment"># 平局</span></span><br><span class="line">elif <span class="attr">player</span> == computer:</span><br><span class="line">    print(<span class="string">"真是心有灵犀啊，再来一把"</span>)</span><br><span class="line"><span class="comment"># 其他的情况就是电脑获胜</span></span><br><span class="line"><span class="keyword">else</span>:</span><br><span class="line">    print(<span class="string">"不服气，我们决战到天明！"</span>)</span><br></pre></td></tr></table></figure>
+
+        <div id="aplayer-QpWUesZU" class="aplayer aplayer-tag-marker" style="margin-bottom: 20px;">
+            <pre class="aplayer-lrc-content"></pre>
+        </div>
+        <script>
+          var ap = new APlayer({
+            element: document.getElementById("aplayer-QpWUesZU"),
+            narrow: false,
+            autoplay: true,
+            showlrc: false,
+            music: {
+              title: "抖音热曲",
+              author: "随机",
+              url: "https://www.lori.tw/dyph.php",
+              pic: "https://i.loli.net/2019/03/07/5c80ce3a5aac4.png",
+              lrc: ""
+            }
+          });
+          window.aplayers || (window.aplayers = []);
+          window.aplayers.push(ap);
+        </script>
+</article><!-- lincense--><div class="license-wrapper"><p> <span>Author:  </span><a href="http://JaneBraun.github.io">云亦然</a></p><p> <span>Link:  </span><a href="http://JaneBraun.github.io/2019/07/26/Python之分支/">http://JaneBraun.github.io/2019/07/26/Python之分支/</a></p><p> <span>Copyright:  </span><span>All articles in this blog are licensed under <a rel="license" href="https://creativecommons.org/licenses/by-nc-nd/3.0">CC BY-NC-SA 3.0</a> unless stating additionally.</span></p></div><div class="post-paginator"><a class="prevSlogan" href="/2019/08/02/Samba服务器架设/" title="Samba服务器架设"><span>< PreviousPost</span><br><span class="prevTitle">Samba服务器架设</span></a><a class="nextSlogan" href="/2019/07/26/Python之Python基础/" title="Python之Python基础"><span>NextPost ></span><br><span class="nextTitle">Python之Python基础</span></a><div class="clear"></div></div><div id="comment"><div id="container"></div><link rel="stylesheet" href="https://jjeejj.github.io/css/gitment.css"><script src="https://jjeejj.github.io/js/gitment.js"></script><script>var gitment = new Gitment({
+  id: 'Python之分支',
+  owner: 'JaneBraun',
+  repo: 'JaneBraun.github.io',
+  oauth: {
+    client_id: '0a088938e28067a01cb2',
+    client_secret: '5ce5adee232943d97b6823758c846e3d0edc3eed',
+  },
+})
+gitment.render('container')</script></div></section></article><footer id="cxo-footer-outer"><div id="cxo-footer-inner"><p class="footer-container"><script src="https://mkblog.cn/blog/demo/motto/js.php"> </script></p><p class="footer-container"><span>Site by </span><a href="http://hexo.io"><span>Hexo</span></a><span> | theme </span><a href="https://github.com/Longlongyu/hexo-theme-Cxo"><span>Cxo</span></a></p><i class="fa fa-user"> </i><span>本站访客数</span><span id="busuanzi_value_site_uv"></span><span> | </span><i class="fa fa-eye"> </i><span>本站访问量</span><span id="busuanzi_value_site_pv"></span></div></footer><!-- catelog--><div class="toc-wrapper" style="top: 70vh;"><div class="toc-catalog"><i class="fa fa-list"> </i><span>CATALOG</span></div><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#python学习笔记之分支"><span class="toc-number">1.</span> <span class="toc-text">python学习笔记之分支</span></a></li></ol></div><!-- top--><i class="fa fa-arrow-up close" id="go-up" aria-hidden="true"></i><script src="/live2d-widget/lib/L2Dwidget.min.js?0c58a1486de42ac6cc1c59c7d98ae887"></script><script>L2Dwidget.init({"pluginRootPath":"live2d-widget/","pluginJsPath":"lib/","pluginModelPath":"assets/","tagMode":false,"debug":false,"model":{"jsonPath":"/live2d-widget/assets/assets/haruto.model.json"},"display":{"position":"right","width":150,"height":300},"mobile":{"show":true,"scale":0.5},"react":{"opacityDefault":0.7,"opacityOnHover":0.2},"log":false});</script></body></html>

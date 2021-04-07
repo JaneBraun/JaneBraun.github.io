@@ -1,0 +1,151 @@
+<!DOCTYPE html><html><head><meta name="generator" content="Hexo 3.8.0"><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no"><meta name="author" content="云亦然"><meta name="renderer" content="webkit"><meta name="baidu-site-verification" content="Gp9ShUqSBW"><meta name="google-site-verification" content="vnHxw9xKnwp2dRWqAPmI-QTMJvCDfbXRuoMzb2RbHZw"><meta name="copyright" content="云亦然"><meta name="keywords" content="Hexo"><meta name="description" content="null"><meta name="Cache-Control" content="no-cache"><meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"><title>网络安全之业务逻辑漏洞 · 云亦然's Blog</title><link rel="stylesheet" href="/css/style.css?v=2018.7.9"><link rel="stylesheet" href="/css/animation.css?v=2018.7.9"><link rel="icon" href="/source/img/assets/favicon.ico"><link rel="stylesheet" href="https://cdn.bootcss.com/font-awesome/4.7.0/css/font-awesome.min.css?version=1.5.6"><!-- scripts--><script>(function( w ){
+  "use strict";
+  // rel=preload support test
+  if( !w.loadCSS ){
+    w.loadCSS = function(){};
+  }
+  // define on the loadCSS obj
+  var rp = loadCSS.relpreload = {};
+  // rel=preload feature support test
+  // runs once and returns a function for compat purposes
+  rp.support = (function(){
+    var ret;
+    try {
+      ret = w.document.createElement( "link" ).relList.supports( "preload" );
+    } catch (e) {
+      ret = false;
+    }
+    return function(){
+      return ret;
+    };
+  })();
+
+  // if preload isn't supported, get an asynchronous load by using a non-matching media attribute
+  // then change that media back to its intended value on load
+  rp.bindMediaToggle = function( link ){
+    // remember existing media attr for ultimate state, or default to 'all'
+    var finalMedia = link.media || "all";
+
+    function enableStylesheet(){
+      link.media = finalMedia;
+    }
+
+    // bind load handlers to enable media
+    if( link.addEventListener ){
+      link.addEventListener( "load", enableStylesheet );
+    } else if( link.attachEvent ){
+      link.attachEvent( "onload", enableStylesheet );
+    }
+
+    // Set rel and non-applicable media type to start an async request
+    // note: timeout allows this to happen async to let rendering continue in IE
+    setTimeout(function(){
+      link.rel = "stylesheet";
+      link.media = "only x";
+    });
+    // also enable media after 3 seconds,
+    // which will catch very old browsers (android 2.x, old firefox) that don't support onload on link
+    setTimeout( enableStylesheet, 3000 );
+  };
+
+  // loop through link elements in DOM
+  rp.poly = function(){
+    // double check this to prevent external calls from running
+    if( rp.support() ){
+      return;
+    }
+    var links = w.document.getElementsByTagName( "link" );
+    for( var i = 0; i < links.length; i++ ){
+      var link = links[ i ];
+      // qualify links to those with rel=preload and as=style attrs
+      if( link.rel === "preload" && link.getAttribute( "as" ) === "style" && !link.getAttribute( "data-loadcss" ) ){
+        // prevent rerunning on link
+        link.setAttribute( "data-loadcss", true );
+        // bind listeners to toggle media back
+        rp.bindMediaToggle( link );
+      }
+    }
+  };
+
+  // if unsupported, run the polyfill
+  if( !rp.support() ){
+    // run once at least
+    rp.poly();
+
+    // rerun poly on an interval until onload
+    var run = w.setInterval( rp.poly, 500 );
+    if( w.addEventListener ){
+      w.addEventListener( "load", function(){
+        rp.poly();
+        w.clearInterval( run );
+      } );
+    } else if( w.attachEvent ){
+      w.attachEvent( "onload", function(){
+        rp.poly();
+        w.clearInterval( run );
+      } );
+    }
+  }
+
+
+  // commonjs
+  if( typeof exports !== "undefined" ){
+    exports.loadCSS = loadCSS;
+  }
+  else {
+    w.loadCSS = loadCSS;
+  }
+}( typeof global !== "undefined" ? global : this ) );</script><script src="https://cdn.jsdelivr.net/npm/jquery@3.3.1/dist/jquery.min.js" defer></script><script src="/js/main.js?v=2018.7.9" defer></script><!-- fancybox--><link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.2.5/jquery.fancybox.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'"><script src="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.2.5/jquery.fancybox.min.js" defer></script><!-- busuanzi--><script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script><link rel="stylesheet" href="\assets\css\APlayer.min.css" class="aplayer-style-marker">
+<script src="\assets\js\APlayer.min.js" class="aplayer-script-marker"></script>
+</head><body><section class="profile-close" id="cxo-profile"><div class="profile-avatar"><i class="fa fa-caret-left"></i><img src="https://i.loli.net/2019/03/07/5c809e0647313.jpg"></div><!--.profile-saying
+  i.fa.fa-comment
+  .saying--><div class="cxo-profile-inner"><div class="profile-name">云亦然</div><div class="profile-signature">天下皆白，唯我独黑。非攻墨门，兼爱平生。</div><div class="friends"><div>FRIENDS</div><span><a href="//www.hxsgyl.top" target="_black">忘年</a></span><span><a href="//bbs.88hack.com/" target="_black">极安中国</a></span><span><a href="//www.soul666.com/" target="_black">Soul博客</a></span></div><div class="read-progress"></div></div></section><header id="cxo-intro" style="height: 70vh;background-image: url(https://api.r10086.com/动漫综合2.php);"><nav id="cxo-intro-nav"><section><div class="intro-nav-title"><a href="/">云亦然's Blog</a></div><div class="intro-nav-label-box"><a href="/">Home</a><a href="/about/">About</a><a href="/archives/">Archives</a><a href="/tags/">Tags</a></div><i class="fa fa-bars intro-nav-menu"><div class="intro-nav-drop"><a href="/">Home</a><a href="/about/">About</a><a href="/archives/">Archives</a><a href="/tags/">Tags</a></div></i><div class="clear"></div></section></nav><h1 class="post-title">网络安全之业务逻辑漏洞</h1><div class="post-intros"><div class="post-intro-meta"><span class="post-intro-time"><i class="post-intro-calendar fa fa-calendar"></i><span>2019-05-31 10:08:10</span></span><span class="post-intro-tags"><a class="intro-tag fa fa-tag" href="javascript:void(0)" date-tags="网络安全"> 网络安全</a></span></div><div class="post-intro-read"><span> Word count: <span class="post-count">1.1k</span> | Reading time: <span class="post-count">3</span>min</span></div></div></header><article class="cxo-up" id="cxo-content-outer"><section id="cxo-content-inner"><article class="article-entry" id="post"><h1 id="常见攻击流程"><a href="#常见攻击流程" class="headerlink" title="常见攻击流程"></a>常见攻击流程</h1><p>正常操作并记录数据包<br>          ⬇（按照正常操作流程，记录其数据包）<br>分析数据包<br>          ⬇(分析数据包，找到数据包中的敏感部分)<br>分析程序验证机制<br>          ⬇(分析程序后台所采用的验证机制、手段)<br>修改源数据包（修改源数据包数据，验证推测是否成功）</p>
+<h1 id="业务逻辑漏洞定义"><a href="#业务逻辑漏洞定义" class="headerlink" title="业务逻辑漏洞定义"></a>业务逻辑漏洞定义</h1><p>业务逻辑漏洞是指由于程序逻辑不严谨或逻辑太复杂，<br>导致一些逻辑分支不能正常处理或处理错误。</p>
+<p><strong> 通俗地讲 </strong> ：一个系统的功能太多后，程序开发人员<br>就难以思考全面，对某些地方可能有遗漏，或者未能正常处理，<br>从而导致逻辑漏洞。逻辑漏洞也可以说是程序开发人员的思路错误、<br>程序 开发人员的逻辑存在漏洞。</p>
+<h1 id="业务逻辑漏洞特效"><a href="#业务逻辑漏洞特效" class="headerlink" title="业务逻辑漏洞特效"></a>业务逻辑漏洞特效</h1><p>业务逻辑漏洞是非常隐蔽的，它不像SQL注入、XSS跨站脚本攻击、<br>命令执行、文件上传漏洞等有鲜明的标识自动化扫描器可以定义一<br>系列的规则识别出这些漏洞，从而业务逻辑漏洞一般出现在功能（业<br>务流程）上，这是漏洞扫描工具无法识别的。</p>
+<p>业务逻辑漏洞只出现于业务流程中（模块功能），也就是说，网站的<br>任何部分都有可能存在着逻辑错误漏洞。比如，修改个人资料就完全<br>可能出现逻辑错误漏洞。</p>
+<h1 id="业务逻辑漏洞常见分类"><a href="#业务逻辑漏洞常见分类" class="headerlink" title="业务逻辑漏洞常见分类"></a>业务逻辑漏洞常见分类</h1><p>业务逻辑漏洞中的用户体系包含如下问题：<br>        1）密码重置问题<br>        2）cookies验证问题<br>        3）越权操作问题</p>
+<p><img src="https://s2.ax1x.com/2019/05/31/VQ2Yp8.jpg" alt=""></p>
+<h1 id="业务逻辑漏洞常见危害"><a href="#业务逻辑漏洞常见危害" class="headerlink" title="业务逻辑漏洞常见危害"></a>业务逻辑漏洞常见危害</h1><p>业务逻辑漏洞<br>        1）任意密码修改<br>         2）越权访问<br>        3）密码任意找回<br>        4）交易支付金额任意修改<br>        5）…</p>
+<h1 id="业务逻辑漏洞–常见的挖掘姿势"><a href="#业务逻辑漏洞–常见的挖掘姿势" class="headerlink" title="业务逻辑漏洞–常见的挖掘姿势"></a>业务逻辑漏洞–常见的挖掘姿势</h1><p>   黑客在挖掘业务逻辑漏洞时的一般操作步骤如下:<br>1）发现网站所提供的功能模块。比如,修改密码、找回密码、修改个人资料等功能。</p>
+<p>2）针对具体的功能确定业务流程，详细划分具体步骤，以购物为例介绍，购物流程如下:<br>    挑选商品，商品可多选；<br>    立刻购买，在“立刻购买”按钮旁边可以选择购买数量、购买样式等；<br>    显示购买信息，在此步骤可以给卖家留言，填写购买数量、使用优惠券、匿名购买、找人付款；<br>    提交订单；<br>    付款。</p>
+<p>3）拦截HTTP/HTTPS请求，分析其参数项的含义;</p>
+<p>4)  修改参数值，尝试触发业务逻辑漏洞；</p>
+<p>5）返回等2步骤，对其他功能继续测试。</p>
+<h1 id="业务逻辑漏洞–密码重置"><a href="#业务逻辑漏洞–密码重置" class="headerlink" title="业务逻辑漏洞–密码重置"></a>业务逻辑漏洞–密码重置</h1><p>密码重置<br><img src="https://s2.ax1x.com/2019/05/31/VQ2Gff.jpg" alt=""></p>
+<h1 id="业务逻辑漏洞–支付交易"><a href="#业务逻辑漏洞–支付交易" class="headerlink" title="业务逻辑漏洞–支付交易"></a>业务逻辑漏洞–支付交易</h1><p>支付交易<br><a href="https://imgchr.com/i/VQ2t1S" target="_blank" rel="noopener"><img src="https://s2.ax1x.com/2019/05/31/VQ2t1S.md.jpg" alt=""></a></p>
+<h1 id="授权验证绕过-常见检测手段"><a href="#授权验证绕过-常见检测手段" class="headerlink" title="授权验证绕过_常见检测手段"></a>授权验证绕过_常见检测手段</h1><p>未授权访问<br>非授权访问是指用户在没有通过认证授权的情况下能够<br>直接访问需要通过认证才能访问的页面或文本信息。尝试将<br>一些敏感的页面链接复制于其他浏览器或其他电脑上进行访<br>问，看是否能访问成功。</p>
+<p>越权访问<br>1、垂直越权（垂直越权是指使用权限低的用户可以访问权限<br>较高的用户）<br>2、水平越权（水平越权是指相同权限的不同用户可以互相访问）</p>
+<h1 id="密码找回漏洞"><a href="#密码找回漏洞" class="headerlink" title="密码找回漏洞"></a>密码找回漏洞</h1><p>密码找回_常见检测手段<br>    1）密码找回的凭证太弱，如只需要填入一个四位或者六位的<br>    纯数字就可以重置密码，导致可以暴力破解。<br>    2）密码找回凭证可从客户端直接获取。<br>    3）密码找回凭证在页面中可以直接获取。<br>    4）用户找回密码的邮箱地址或者手机号码被修改。<br>    5）在最后提交修改的密码处的逻辑错误。</p>
+<p>检测手段：凭证太弱、客户端获取、页面获取、信息修改、密码逻辑错误</p>
+
+        <div id="aplayer-nQHLsHHR" class="aplayer aplayer-tag-marker" style="margin-bottom: 20px;">
+            <pre class="aplayer-lrc-content"></pre>
+        </div>
+        <script>
+          var ap = new APlayer({
+            element: document.getElementById("aplayer-nQHLsHHR"),
+            narrow: false,
+            autoplay: true,
+            showlrc: false,
+            music: {
+              title: "抖音新曲",
+              author: "随机",
+              url: "https://api.uomg.com/api/rand.music",
+              pic: "https://i.loli.net/2019/03/07/5c80ce3a5aac4.png",
+              lrc: ""
+            }
+          });
+          window.aplayers || (window.aplayers = []);
+          window.aplayers.push(ap);
+        </script>
+</article><!-- lincense--><div class="license-wrapper"><p> <span>Author:  </span><a href="http://JaneBraun.github.io">云亦然</a></p><p> <span>Link:  </span><a href="http://JaneBraun.github.io/2019/05/31/网络安全之业务逻辑漏洞/">http://JaneBraun.github.io/2019/05/31/网络安全之业务逻辑漏洞/</a></p><p> <span>Copyright:  </span><span>All articles in this blog are licensed under <a rel="license" href="https://creativecommons.org/licenses/by-nc-nd/3.0">CC BY-NC-SA 3.0</a> unless stating additionally.</span></p></div><div class="post-paginator"><a class="prevSlogan" href="/2019/07/08/网络安全之暴力破解攻击/" title="网络安全之暴力破解攻击"><span>< PreviousPost</span><br><span class="prevTitle">网络安全之暴力破解攻击</span></a><a class="nextSlogan" href="/2019/05/15/网络安全之上传漏洞/" title="网络安全之上传漏洞"><span>NextPost ></span><br><span class="nextTitle">网络安全之上传漏洞</span></a><div class="clear"></div></div><div id="comment"><div id="container"></div><link rel="stylesheet" href="https://jjeejj.github.io/css/gitment.css"><script src="https://jjeejj.github.io/js/gitment.js"></script><script>var gitment = new Gitment({
+  id: '网络安全之业务逻辑漏洞',
+  owner: 'JaneBraun',
+  repo: 'JaneBraun.github.io',
+  oauth: {
+    client_id: '0a088938e28067a01cb2',
+    client_secret: '5ce5adee232943d97b6823758c846e3d0edc3eed',
+  },
+})
+gitment.render('container')</script></div></section></article><footer id="cxo-footer-outer"><div id="cxo-footer-inner"><p class="footer-container"><script src="https://mkblog.cn/blog/demo/motto/js.php"> </script></p><p class="footer-container"><span>Site by </span><a href="http://hexo.io"><span>Hexo</span></a><span> | theme </span><a href="https://github.com/Longlongyu/hexo-theme-Cxo"><span>Cxo</span></a></p><i class="fa fa-user"> </i><span>本站访客数</span><span id="busuanzi_value_site_uv"></span><span> | </span><i class="fa fa-eye"> </i><span>本站访问量</span><span id="busuanzi_value_site_pv"></span></div></footer><!-- catelog--><div class="toc-wrapper" style="top: 70vh;"><div class="toc-catalog"><i class="fa fa-list"> </i><span>CATALOG</span></div><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#常见攻击流程"><span class="toc-number">1.</span> <span class="toc-text">常见攻击流程</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#业务逻辑漏洞定义"><span class="toc-number">2.</span> <span class="toc-text">业务逻辑漏洞定义</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#业务逻辑漏洞特效"><span class="toc-number">3.</span> <span class="toc-text">业务逻辑漏洞特效</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#业务逻辑漏洞常见分类"><span class="toc-number">4.</span> <span class="toc-text">业务逻辑漏洞常见分类</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#业务逻辑漏洞常见危害"><span class="toc-number">5.</span> <span class="toc-text">业务逻辑漏洞常见危害</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#业务逻辑漏洞–常见的挖掘姿势"><span class="toc-number">6.</span> <span class="toc-text">业务逻辑漏洞–常见的挖掘姿势</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#业务逻辑漏洞–密码重置"><span class="toc-number">7.</span> <span class="toc-text">业务逻辑漏洞–密码重置</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#业务逻辑漏洞–支付交易"><span class="toc-number">8.</span> <span class="toc-text">业务逻辑漏洞–支付交易</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#授权验证绕过-常见检测手段"><span class="toc-number">9.</span> <span class="toc-text">授权验证绕过_常见检测手段</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#密码找回漏洞"><span class="toc-number">10.</span> <span class="toc-text">密码找回漏洞</span></a></li></ol></div><!-- top--><i class="fa fa-arrow-up close" id="go-up" aria-hidden="true"></i><script src="/live2d-widget/lib/L2Dwidget.min.js?0c58a1486de42ac6cc1c59c7d98ae887"></script><script>L2Dwidget.init({"pluginRootPath":"live2d-widget/","pluginJsPath":"lib/","pluginModelPath":"assets/","tagMode":false,"debug":false,"model":{"jsonPath":"/live2d-widget/assets/assets/haruto.model.json"},"display":{"position":"right","width":150,"height":300},"mobile":{"show":true,"scale":0.5},"react":{"opacityDefault":0.7,"opacityOnHover":0.2},"log":false});</script></body></html>
